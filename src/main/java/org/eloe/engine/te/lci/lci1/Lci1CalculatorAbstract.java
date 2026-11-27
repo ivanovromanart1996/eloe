@@ -28,9 +28,9 @@ public abstract class Lci1CalculatorAbstract implements ILciCalculator {
 			return 0;
 		}
 		
-		//Длина исследуемой части гена (3 - стоп-кодон)
+		//The length of the part of the gene under study (3 - stop codon)
 		int lenght = gene.getLength()-3+rightFlank;
-		//Граница левого края скользящей рамки
+		//The boundary of the left edge of the sliding frame
 		int edge = lenght-2*parameters.getSmax1()-parameters.getLmax1()+1;
 		if (edge < 0) {
 			LOG.info("The length of gene "+gene.getName()+" with flanks is not enough for LCI1 calculation.");
@@ -38,35 +38,35 @@ public abstract class Lci1CalculatorAbstract implements ILciCalculator {
 		}
 		
 		char[] na = new char[lenght];
-		//Достаем ген без флангов + h нуклеотидов на 3' конце
+		//Get the gene without flanks + h nucleotides at the 3' end
 		System.arraycopy(gene.getNaWithFlanks(), gene.getLeftFlankLength(), na, 0, lenght);
 		
-		//Счетчик повторов
+		//Repeat counter
 		int counter = 0;
 		for (int j = 0; j < edge; j++) {
 			for (int s = parameters.getSmin1(); s <= parameters.getSmax1(); s++) {
 				
-				//Строка для повтора
+				//Buffer for the repeat
 				char[] char1 = new char[s];
-				//Копирование последовательности
+				//Copying the sequence
 				System.arraycopy(na, j, char1, 0, s);
-				//Строка для комплементарной последовательности
+				//Buffer for the complementary sequence
 				String con1 = String.valueOf(reverseComplement(char1));
 				
-				//Длина участка поиска
+				//Length of search area
 				int lenght1 = s+distance;
-				//Участок поиска
+				//Search site
 				char[] char2 = new char[lenght1];
-				//Достаем участок поиска
+				//Extract the search region.
 				System.arraycopy(na, j+s+parameters.getLmin1(), char2, 0, lenght1);
-				//Участок поиска
+				//Search site
 				String con2 = String.valueOf(char2);
 				
 				int poz = 0;
-				//Поиск повторов (комплементарных участков)
+				//Search for repeats (complementary regions).
 				int k = con2.indexOf(con1, poz);
 				while (k != -1) {
-					//Подсчет повторов
+					//Counting repeats
 					counter++;
 					poz = k + 1;
 					k = con2.indexOf(con1, poz);

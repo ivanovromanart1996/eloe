@@ -19,6 +19,10 @@ public abstract class OrganismBuilder {
 		
 		for (File orgFile : orgFileList) {
 			Extractor extractor = ExtractorFactory.getExtractor(orgFile, parameters, resultFolder);
+			if (extractor == null || !orgFile.isFile()) {
+				LOG.info("Skipping unsupported input: " + orgFile);
+				continue;
+			}
 			Organism chr = extractor.extract();
 			if (chr == null) {
 				continue;
@@ -31,10 +35,10 @@ public abstract class OrganismBuilder {
 			return null;
 		}
 		
-		//Вывод извлеченных данных в консоль
+		//Output of extracted data to the console
 		LOG.info(organism);
 		
-		//Разметка оперона, если организм прокариотический
+		//Annotate operons if the organism is prokaryotic.
     	organism.markCistrons();
     	
 		return organism;

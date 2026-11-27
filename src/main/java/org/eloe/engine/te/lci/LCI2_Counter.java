@@ -11,29 +11,29 @@ import org.eloe.engine.te.lci.lci2.Lci2Calculator;
 import org.eloe.organism.Gene;
 import org.eloe.parameters.PLCI2;
 
-// Програма для подсчета индекса локальной комплементарности
+// Program for calculating the local complementarity index
 
 public class LCI2_Counter {
 	
 	private static final String ENERGY_TXT = "lci2double.txt";
 	
-	//Среднее значение LCI
+	//Average LCI value
 	private double m2;
-	//Среднее отклонение LCI
+	//Average deviation of LCI
 	private double sigma2;
 	
 	private ILciCalculator lci2Calculator;
 	
-	//Конструктор
+	//Constructor
 	public LCI2_Counter(PLCI2 parameters) throws IOException, NumberFormatException {
 		
-		//Карта для записи энергии динуклеотидов
+		//Map for recording the energy of dinucleotides
 		Map<String, Double> map = new HashMap<String, Double>();
 		StringBuilder loopsenergy = new StringBuilder();
 		BufferedReader reader = null;
 		try {
 			String line = new String();
-			//Чтение файла с энергиями динуклеотидов и петель
+			//Reading a file with energies of dinucleotides and loops
 			reader = new BufferedReader(new InputStreamReader(
 					LCI2_Counter.class.getClassLoader().getResourceAsStream(ENERGY_TXT)));
 			while (!(line = reader.readLine()).startsWith("//")){
@@ -55,7 +55,7 @@ public class LCI2_Counter {
 		}
 		
 		String loopsenergy1[] = loopsenergy.toString().split(";");
-		//Массив для записи энергии петель
+		//Array for loop energies
 		double loopenergy[] = new double[loopsenergy1.length];
 		for (int i = 0; i < loopsenergy1.length; i++) {
 			loopenergy[i] = Double.parseDouble(loopsenergy1[i].trim());
@@ -64,7 +64,7 @@ public class LCI2_Counter {
 		lci2Calculator = new Lci2Calculator(parameters, map, loopenergy);
 	}
 	
-	//TODO Рассчет LCI2
+	//TODO Calculation of LCI2
 	public void countLCI(List<Gene> genes) {
 		
 		double sum = 0;
@@ -81,21 +81,21 @@ public class LCI2_Counter {
 		double average = sum/genes.size();
 		double disp = Math.sqrt(sum2/genes.size()-average*average);
 		
-		//фортран
+		//Fortran
 		this.m2 = average+disp;
 		this.sigma2 = 2*disp;
 		
-		//статьи
+		//Articles
 		//this.m2 = average;
 		//this.sigma2 = forSigma2*disp;
 	}
 	
-	//TODO Возвращает среднее значение LCI
+	//TODO Returns the average LCI
 	public double getM() {
 		return this.m2;
 	}
 	
-	//TODO Возвращает среднее отклонение LCI
+	//TODO Returns the mean deviation of the LCI
 	public double getSigma() {
 		return this.sigma2;
 	}

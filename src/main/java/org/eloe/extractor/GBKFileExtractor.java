@@ -15,7 +15,7 @@ import org.eloe.parameters.PExtraction;
 
 public class GBKFileExtractor extends Extractor {
 	
-	//2025.10.15 контейнер для хранения /locus_tag и /note гена (gene), а также информацию о его рибосомальности
+	//2025.10.15 Stores the gene feature’s /locus_tag, /note and ribosomal status.
 	private static class GeneNote {
 		public String locus_tag;
 		public String note;
@@ -44,7 +44,7 @@ public class GBKFileExtractor extends Extractor {
 	public final Organism extract() {
 		Organism organism = new Organism();
 		
-		//Считывание файла с геномом
+		//Reading a genome file
 		BufferedReader reader = null;
 		try {
 			reader = new BufferedReader(new FileReader(orgFile));
@@ -55,16 +55,16 @@ public class GBKFileExtractor extends Extractor {
 				return null;
 			}
 			
-			//Линейная ДНК или кольцевая
+			//Linear or circular DNA
 			boolean linear = true;
 			if (line.contains(" circular ")) {
 				linear = false;
 			}
 			
 			String[] arr3 = line.split("\\s+");
-			//Название карточки
+			//Record name
 			this.card = arr3[1];
-			//Размер генома
+			//Genome size
 			int genomeSize = Integer.parseInt(arr3[2]);
 			organism.setGenomeSize(genomeSize);
 
@@ -75,14 +75,14 @@ public class GBKFileExtractor extends Extractor {
 				return null;
 			}
 			
-			//Определение названия организма
+			//Determination of the name of the organism
 			boolean flagOrg = true;
 			do {
 				line = reader.readLine().trim();
-				//Считывание названия организма
+				//Reading the name of the organism
 				if (line.startsWith("ORGANISM")) {
 					String organismName = line.replace("ORGANISM  ", "");
-					//Форматирование имени организма, чтобы его можно было использовать в названии файла
+					//Formatting the name of the organism so that it can be used in the file name
 					organismName = organismName.replaceAll(ORGNAME, "");
 					organismName = organismName.replaceAll("ORGNAME_", "_");
 					organism.setName(organismName.toLowerCase());
@@ -102,87 +102,87 @@ public class GBKFileExtractor extends Extractor {
 			while (!(line = reader.readLine()).startsWith("FEATURES ")) {}
 			
 			//============================================================================================
-	        //Считывание из карточки информации о генах===================================================
+	        //Read gene information from the record===================================================
 	        //TODO========================================================================================
 			
-			//Флаг для определения гена (CDS)
+			//Gene Detection Flag (CDS)
 			boolean flagCDS = false;
-			//Флаг для определения псевдогена
+			//Flag to identify pseudogene
 			boolean flagPseudoGene = false;
-			//Флаг для определения продукта гена
+			//Flag to identify gene product
 			boolean flagProduct = false;
-			//Флаг для определения индекса белка
+			//Flag to determine protein index
 			boolean flagProtID = false;
-			//Флаг для определения индекса гена
+			//Flag to determine gene index
 			boolean flagDBxref = false;
-			//Флаг для определения id гена в FLYBASE
+			//Flag for identifying the FlyBase gene ID
 			//boolean flagFBid = false;
-			//Флаг для нотации гена
+			//Flag for reading the gene note
 			boolean flagNote = false;
-			//Флаг для нотации гена, разбитой на много строк
+			//Flag for reading a multiline gene note
 			boolean flagNoteMultistring = false;
-			//Флаг для индекса гена
+			//Flag for gene index
 			boolean flagLocus = false;
-			//Флаг того, что мы находимся в конетксте (CDS)
-			//UPD:2025.10.15 закомментировала, т.к. это CDS находится в контексте gene, а не наоборот
+			//Flag of the fact that we are in context (CDS)
+			//UPD:2025.10.15 Commented out because the CDS belongs to the gene feature.
 			//boolean flagContext = false;
-			//Позиция конца предыдущего гена
+			//Position of the end of the previous gene
 			int lastpoz =  -2-parameters.getDistBOper();
-			//Позиция предыдущего гена в цепи
+			//Strand of the previous gene
 			boolean lastpozcomplement = false;
 			
 			while (!(line = reader.readLine()).startsWith("ORIGIN")) {
 				line = line.trim();
 				
-				//Считывание информации о гене (CDS)
+				//Gene Information Reading (CDS)
 				if (line.startsWith(parameters.getContext() + "   ")) {
-					//2025.10.16 Если это самая первая CDS, то код ниже нужно пропустить
+					//2025.10.16 If this is the very first CDS, then the code below should be skipped
 					int num = organism.getGenes().size();
-					//2025.10.16 блок ниже нужен ТОЛЬКО для генов с множеством CDS. В противном случае,
-					//не отработает проверка на равенство локус-тэгов, и это нормально.
+					//2025.10.16 The block below is needed only for genes with multiple CDS features. Otherwise,
+					//the locus tags will not match, as expected.
 					if (0 != num) {
-						//2025.10.16 Началась новая CDS, поэтому необходимо сохранить информацию, полученную 
-						//при обработке gene, соответствующего ВСЕЙ СЕРИИ CDS
-						//Сохраняем информацию о /note и рибосомальности
+						//2025.10.16 A new CDS feature has started. Save the information collected 
+						//while processing the gene feature associated with the entire series of CDS features.
+						//Save the /note and ribosomal status.
 						Gene g = organism.getGenes().get(num - 1);
 						if (null != this.geneNote.note && this.geneNote.locus_tag.equals(g.getLocusTag())) {
 							g.setNote(this.geneNote.note);
 							if (this.geneNote.isRib && !g.isRibosomal()) {
 								g.setRibosomal(true);
-								//Число рибосомных генов
+								//Number of ribosomal genes
 								organism.addRibGene();
 							}
 						}
 					}
 					//flagContext = true;
-					//Число генов, порядковый номер
+					//Number of genes, sequence number
 					organism.addGene();
-					//Число оперонов
+					//Number of operons
 					if (!organism.isEukaryota()) {
 						organism.addOperon();
 					}
 					
 					boolean useGeneInCounting = true;
-					//Наличие "complement"
+					//Whether the location contains "complement"
 					boolean complement = false;
-					//Количество экзонов в гене
+					//Number of exons in the gene
 					int numberOfExons = 0;
 					
-					//Запись позиций (гена) экзонов
+					//Record of positions (gene) of exons
 					String position = line.replace(parameters.getContext() + "            ", "");
-					//Считывание всех позиций гена
+					//Reading all gene positions
 					while (!(line = reader.readLine().trim()).startsWith("/")) {
 						position += line;
 					}
-					//Удаление скобок () и знаков <>
+					//Removal of brackets () and characters <>
 					position = position.replaceAll(BRACKETS, "");
 					
-					//Массив стартов экзонов
+					//Array of exon start positions
 					int[] start = null;
-					//Массив концов экзонов
+					//Array of exon end positions
 					int[] stop = null;
 					
-					//Если позиция начинается с идентификатора "join"
+					//If the position begins with the "join" identifier
 					if (position.startsWith("join")) {
 						if (position.contains("complement")) {
 							position = position.replace("complement", "");
@@ -193,23 +193,23 @@ public class GBKFileExtractor extends Extractor {
 						position = position.replace("join", "");
 						
 						if (position.contains(",")) {
-							//Массив позиций экзонов
+							//Array of exon positions
 							String[] pozOfExons = position.split(",");
-							//Количество экзонов
+							//Number of exons
 							numberOfExons = pozOfExons.length;
-							//Массив начал экзонов
+							//Array of exon start positions
 							start = new int[numberOfExons];
-							//Массив концов экзонов
+							//Array of exon end positions
 							stop = new int[numberOfExons];
 							
 							for (int i = 0; i < numberOfExons; i++) {
-								//Если указаны и начало и конец
+								//If both the beginning and the end are indicated
 								if (pozOfExons[i].contains("..")) {
 									String[] arr = pozOfExons[i].split("\\.\\.");
 									start[i] = Integer.parseInt(arr[0]);
 									stop[i] = Integer.parseInt(arr[1]);
 								}
-								//Если позиция состоит из одного нуклеотида
+								//If the position consists of one nucleotide
 								else {
 									start[i] = Integer.parseInt(pozOfExons[i]);
 									stop[i] = Integer.parseInt(pozOfExons[i]);
@@ -217,34 +217,34 @@ public class GBKFileExtractor extends Extractor {
 							}
 						}
 					} 
-					//Если позиция начинается с идентификатора "complement"
+					//If the position begins with the "complement" identifier
 					else {
 						if (position.startsWith("complement")) {
 							position = position.replace("complement", "");
 							complement = true;
 							
-							//Если позиции содержат идентификатор "join"
+							//If the positions contain the "join" identifier
 							if (position.startsWith("join")) {
 								position = position.replace("join", "");
 								
 								if (position.contains(",")) {
-									//Массив позиций экзонов
+									//Array of exon positions
 									String pozOfExons[] = position.split(",");
-									//Количество экзонов
+									//Number of exons
 									numberOfExons = pozOfExons.length;
-									//Массив начал экзонов
+									//Array of exon start positions
 									start = new int[numberOfExons];
-									//Массив концов экзонов
+									//Array of exon end positions
 									stop = new int[numberOfExons];
 									
 									for (int i = 0; i < numberOfExons; i++) {
-										//Если указаны и начало и конец
+										//If both the beginning and the end are indicated
 										if (pozOfExons[i].contains("..")) {
 											String arr[] = pozOfExons[i].split("\\.\\.");
 											start[i] = Integer.parseInt(arr[0]);
 											stop[i] = Integer.parseInt(arr[1]);
 										}
-										//Если позиция состоит из одного нуклеотида
+										//If the position consists of one nucleotide
 										else {
 											start[i] = Integer.parseInt(pozOfExons[i]);
 											stop[i] = Integer.parseInt(pozOfExons[i]);
@@ -253,22 +253,22 @@ public class GBKFileExtractor extends Extractor {
 									}
 								}
 							} 
-							//Если позиции не содержат идентификатор "join"
+							//If the positions do not contain the "join" identifier
 							else {
-								//Количество экзонов
+								//Number of exons
 								numberOfExons = 1;
-								//Массив из 1-го элемента начал экзонов
+								//Array containing the start position of the first exon
 								start = new int[numberOfExons];
-								//Массив из 1-го элемента концов экзонов
+								//Array containing the end position of the first exon
 								stop = new int[numberOfExons];
 								
-								//Если указаны и начало и конец
+								//If both the beginning and the end are indicated
 								if (position.contains("..")) {
 									String[] arr = position.split("\\.\\.");
 									start[0] = Integer.parseInt(arr[0]);
 									stop[0] = Integer.parseInt(arr[1]);
 								} 
-								//Если позиция состоит из одного нуклеотида
+								//If the position consists of one nucleotide
 								else {
 									start[0] = Integer.parseInt(position);
 									stop[0] = Integer.parseInt(position);
@@ -276,22 +276,22 @@ public class GBKFileExtractor extends Extractor {
 								}
 							}
 						}
-						//Если позиции не содержат идентификаторы "join" и "complement"
+						//If the positions do not contain the identifiers "join" and "complement"
 						else {
-							//Количество экзонов
+							//Number of exons
 							numberOfExons = 1;
-							//Массив из 1-го элемента начал экзонов
+							//Array containing the start position of the first exon
 							start = new int[numberOfExons];
-							//Массив из 1-го элемента концов экзонов
+							//Array containing the end position of the first exon
 							stop = new int[numberOfExons];
 							
-							//Если указаны и начало и конец
+							//If both the beginning and the end are indicated
 							if (position.contains("..")) {
 								String[] arr = position.split("\\.\\.");
 								start[0] = Integer.parseInt(arr[0]);
 								stop[0] = Integer.parseInt(arr[1]);
 							} 
-							//Если позиция состоит из одного нуклеотида
+							//If the position consists of one nucleotide
 							else {
 								start[0] = Integer.parseInt(position);
 								stop[0] = Integer.parseInt(position);
@@ -300,19 +300,19 @@ public class GBKFileExtractor extends Extractor {
 						}
 					}
 					
-					//Проверка расстояния между соседними генами
+					//Checking the distance between neighboring genes
 					if (!organism.isEukaryota() && !(lastpozcomplement ^ complement) && (start[0] - lastpoz - parameters.getDistBOper() - 2 < 0)) {
 						organism.delOperon();
 					}
 					
-					//Позиция конца гена
+					//Position of the end of the gene
 					lastpoz = stop[numberOfExons - 1];
-					//Позиция гена в цепи
+					//Gene location on the strand
 					lastpozcomplement = complement;
 					
-					//Запись гена организма
+					//Recording an organism's gene
 					Gene gene = new Gene(organism.getGenesNumber(), start, stop, organism.getOperonsNumber(), complement, useGeneInCounting);
-					//Запись нового гена в список
+					//Putting a new gene on the list
 					organism.getGenes().add(gene);
 					
 					flagCDS = true;
@@ -325,46 +325,46 @@ public class GBKFileExtractor extends Extractor {
 					flagPseudoGene = true;
 				}
 				
-				//Название гена
+				//Name of the gene
 				if (flagCDS && line.startsWith("/gene=")) {
 					/*if (p4.matcher(line).matches()) {
 						l.get(l.size()-1).putR(true);
-						//Число рибосомных генов
+						//Number of ribosomal genes
 						this.ribgenes++;
 					}*/
 					
-					//Определение рибосомных генов по названию гена
+					//Determination of ribosomal genes by gene name
 					if (parameters.isUseRibGenesAsHighExpressed1() && RIBOSOMALG.matcher(line).matches()) {
 						if (!organism.getGenes().get(organism.getGenes().size() - 1).isRibosomal()) {
 							organism.getGenes().get(organism.getGenes().size() - 1).setRibosomal(true);
-							//Число рибосомных генов
+							//Number of ribosomal genes
 							organism.addRibGene();
 						}
 					}
 					
-					//Определение высоко экспрессирующихся генов по метке
+					//Determination of highly expressed genes by label
 					if (parameters.isUseOtherGenesAsHighExpressed1() && line.contains(" highexpressed")) {
 						if (!organism.getGenes().get(organism.getGenes().size() - 1).isRibosomal()) {
 							organism.getGenes().get(organism.getGenes().size() - 1).setRibosomal(true);
-							//Число рибосомных генов
+							//Number of ribosomal genes
 							organism.addRibGene();
 						}
 					}
 					
-					//Запись названия гена
+					//The name of the gene
 					organism.getGenes().get(organism.getGenes().size() - 1).setName(line.substring("/gene=".length()).replace("\"", ""));
 					flagCDS = false;
 				}
 				
-				//Определение псевдогена
+				//Definition of a pseudogene
 				if (flagPseudoGene && line.toLowerCase().startsWith("/pseudo")) {
 					organism.addPseudoGene();
-					//Отметка о псевдогене
+					//The pseudogene mark
 					organism.getGenes().get(organism.getGenes().size() - 1).setPseudo(true);
 					flagPseudoGene = false;
 				}
 				
-				//Индекс гена
+				//Gene index
 				if (line.startsWith("/locus_tag=")) {
 					if (flagLocus) {
 						organism.getGenes().get(organism.getGenes().size() - 1).setLocusTag(line.substring("/locus_tag=".length()).replace("\"", ""));
@@ -374,7 +374,7 @@ public class GBKFileExtractor extends Extractor {
 					}
 				}
 				
-				//Название продукта гена
+				//Name of gene product
 				if (flagProduct && line.startsWith("/product=")) {
 					if (line.contains("COG")) {
 						Matcher m2 = COGID.matcher(line);
@@ -389,14 +389,14 @@ public class GBKFileExtractor extends Extractor {
 						line = reader.readLine();
 					}*/
 					
-					//Запись названия продукта гена
+					//Recording the name of the gene product
 					organism.getGenes().get(organism.getGenes().size() - 1).setProteinName(line1.substring("/product=".length()).replace("\"", ""));
 					
-					//Определение рибосомных генов по названию продукта гена
+					//Determination of ribosomal genes by name of gene product
 					if (parameters.isUseRibGenesAsHighExpressed1() && RIBOSOMAlP.matcher(line1).matches() && !NONRIBOSOMAL.matcher(line1).matches()) {
 						if (!organism.getGenes().get(organism.getGenes().size() - 1).isRibosomal()) {
 							organism.getGenes().get(organism.getGenes().size() - 1).setRibosomal(true);
-							//Число рибосомных генов
+							//Number of ribosomal genes
 							organism.addRibGene();
 						}
 					}
@@ -417,13 +417,13 @@ public class GBKFileExtractor extends Extractor {
 					flagDBxref = false;
 				}
 				
-				//Дозапись многострочной /note
+				//Multi-line /note recording
 				if (flagNoteMultistring) {
 					this.geneNote.note += line.replace("\"", "");
 					flagNoteMultistring = false;
 				}
 				
-				//Запись аннотации
+				//Recording of annotations
 				if (line.startsWith("/note=")) { 
 					if (flagNote){
 						if (line.contains("COG")) {
@@ -440,32 +440,32 @@ public class GBKFileExtractor extends Extractor {
 						
 						organism.getGenes().get(organism.getGenes().size() - 1).setNote(line1.substring("/note=".length()).replace("\"", ""));
 						
-						//Определение рибосомных генов по аннотации гена
+						//Determination of ribosomal genes by gene annotation
 						if (parameters.isUseRibGenesAsHighExpressed1() && RIBOSOMAlP.matcher(line1).matches() && !NONRIBOSOMAL.matcher(line1).matches()) {
 							if (!organism.getGenes().get(organism.getGenes().size() - 1).isRibosomal()) {
 								organism.getGenes().get(organism.getGenes().size() - 1).setRibosomal(true);
-								//Число рибосомных генов
+								//Number of ribosomal genes
 								organism.addRibGene();
 							}
 						}
 						flagNote = false;
 					} else /*if (flagGene)*/ {
-						//TODO: добавить парсинг COG у gene по аналогии, как в блоке выше
-						//Определение начала многострочного /note
+						//TODO: Parse COG in the gene feature using the same approach as above.
+						//Definition of the beginning of the multiline /note
 						String s = line.substring("/note=".length());
 						this.geneNote.note = s.replace("\"", "");
 						int countBrackets = s.length() - this.geneNote.note.length();
 						if (countBrackets == 1) {
 							flagNoteMultistring = true;
 						}
-						//Определение рибосомных генов по аннотации гена
+						//Determination of ribosomal genes by gene annotation
 						if (parameters.isUseRibGenesAsHighExpressed1() && RIBOSOMAlP.matcher(line).matches() && !NONRIBOSOMAL.matcher(line).matches()) {
 							this.geneNote.isRib = true;
 						}
 					}
 				}
 				
-				//id гена в FLYBASE
+				//FlyBase gene ID
 				/*if (flagFBid && line.startsWith("/db_xref=\"FLYBASE:FB")) {
 					organism.genes.get(organism.genes.size()-1).putFBid(line.substring(18, 29));
 					flagFBid = false;
@@ -490,67 +490,67 @@ public class GBKFileExtractor extends Extractor {
 					flagDBxref = false;
 					//flagContext = false;
 					flagNote = false;
-					//2025.10.16 Закончилась последняя CDS для текущего gene, поэтому необходимо сохранить 
-					//информацию, полученную при обработке gene, соответствующего ей (этот gene шёл ДО CDS)
-					//Сохраняем информацию о /note и рибосомальности
+					//2025.10.16 The last CDS for this gene has ended. Save the 
+					//information collected from the gene feature that preceded the CDS.
+					//Save the /note and ribosomal status.
 					int num = organism.getGenes().size();
-					//для первого gene код ниже нерелевантен
+					//The code below does not apply to the first gene.
 					if (num != 0) {
 						Gene g = organism.getGenes().get(num - 1);
 						if (null != this.geneNote.note && this.geneNote.locus_tag.equals(g.getLocusTag())) {
 							g.setNote(this.geneNote.note);
 							if (this.geneNote.isRib && !g.isRibosomal()) {
 								g.setRibosomal(true);
-								//Число рибосомных генов
+								//Number of ribosomal genes
 								organism.addRibGene();
 							}
 						}
-						//2025.10.15 Обнуляем инфу о предыдущем гене
+						//2025.10.15 Reset the information about the previous gene.
 						this.geneNote.reset();
 					}
 				}
 				
-				//Определение количества tRNA
+				//Determination of tRNA quantity
 				if (line.startsWith("tRNA          ")) {
 					organism.addtRnaGene();
 				}
 			}
 			
-			//2025.10.16 Обработка самой последней CDS последнего gene 
-			//Сохраняем информацию о /note и рибосомальности
+			//2025.10.16 Process the final CDS of the final gene. 
+			//Save the /note and ribosomal status.
 			int num = organism.getGenes().size();
-			//в норме проверка ниже всегда проходит
+			//Normally, the test below always passes.
 			if (num != 0) {
 				Gene g = organism.getGenes().get(num - 1);
 				if (null != this.geneNote.note && this.geneNote.locus_tag.equals(g.getLocusTag())) {
 					g.setNote(this.geneNote.note);
 					if (this.geneNote.isRib && !g.isRibosomal()) {
 						g.setRibosomal(true);
-						//Число рибосомных генов
+						//Number of ribosomal genes
 						organism.addRibGene();
 					}
 				}
 			}
 			
 			//============================================================================================
-			//Считывание из карточки полной нуклеотидной последовательности===============================
+			//Read the complete nucleotide sequence from the record===============================
 			//TODO========================================================================================
 			
-			//Массив для записи полного генома
+			//An array to record a complete genome
 			char[] wholeGenome = new char[genomeSize];
 			
 			int pozstrGenome = 0;
 			
-			//Число GC и CG пар, GC-состав
+			//Number of GC and CG pairs, GC-composition
 			int gc = 0;
 			
-			//Считывание геномной последовательности
+			//Genomic sequence reading
 			while (!(line = reader.readLine()).startsWith("//")) {
 				line = line.trim();
 				
 				String[] arr = line.split(" ");
 				
-				//Строка для записи геномной последовательности
+				//Line for recording genomic sequence
 				StringBuilder strGenome = new StringBuilder();
 				for (int i = 1; i < arr.length; i++) {
 					strGenome.append(arr[i]);
@@ -568,14 +568,14 @@ public class GBKFileExtractor extends Extractor {
 				pozstrGenome += ch.length;
 			}
 			
-			//GC-состав генома
+			//GC composition
 			organism.addGC(gc);
 			double gccom = Math.round(gc*10000.0/genomeSize)/100.0;
 			
 			int lFlang1;
 			int rFlang1;
 			
-			//TODO Запись последовательностей генов в экземпляры класса
+			//TODO Recording gene sequences in instances of a class
 			int smax = Math.max(parameters.getSmax1(), parameters.getSmax2());
 			int lmax = Math.max(parameters.getLmax1(), parameters.getLmax2());
 			int minRFlang = smax+lmax;
@@ -588,63 +588,63 @@ public class GBKFileExtractor extends Extractor {
 					rFlang1 = parameters.getrFlang() < minRFlang ? minRFlang : parameters.getrFlang();
 				}
 				
-				//Число интронов
+				//Number of introns
 				int numderOfIntrons = organism.getGenes().get(i).getStart().length;
 				
-				//Позиция начала гена
+				//The position of the gene onset
 				int strt = organism.getGenes().get(i).getStart()[0];
 				
-				//Позиция конца гена
+				//Position of the end of the gene
 				int stp = organism.getGenes().get(i).getStop()[numderOfIntrons - 1];
 				int stp1 = stp + rFlang1 - genomeSize;
 				int dlinaGenaBezFl = 0;
 				int dlinaGena;
 				
-				//Строка для записи последовательности гена
+				//A string to record a gene sequence
 				char[] strNA;
 				
 				//char strNA2[] = new char[2003];
 				
-				//Определение длины гена без флангов
+				//Determination of gene length without flanks
 				for (int j = 0; j < numderOfIntrons; j++) {
 					dlinaGenaBezFl += organism.getGenes().get(i).getStop()[j] - organism.getGenes().get(i).getStart()[j] + 1;
 				}
 				
-				//Если ДНК линейная
+				//If DNA is linear
 				if (linear) {
-					//Если длина левого фланга больше, чем есть на хромосоме до начала гена
+					//If the left flank is longer than it is on the chromosome before the gene begins
 					if (strt < lFlang1) {
 						lFlang1 = strt - 1;
 						organism.getGenes().get(i).getStart()[0] = 1;
 						organism.getGenes().get(i).setFlagUse(false);
 					} 
-					//Если длина левого фланга меньше, чем есть на хромосоме до начала гена
+					//If the left flank is smaller than it is on the chromosome before the gene begins
 					else {
 						organism.getGenes().get(i).getStart()[0] -= lFlang1;
 					}
 					
-					//Если длина правого фланга больше, чем есть на хромосоме после конца гена
+					//If the right flank is longer than it is on the chromosome after the end of the gene
 					if (stp1 > 0) {
 						rFlang1 = genomeSize - stp;
 						organism.getGenes().get(i).getStop()[numderOfIntrons - 1] = genomeSize;
 						organism.getGenes().get(i).setFlagUse(false);
 					} 
-					//Если длина правого фланга меньше, чем есть на хромосоме после конца гена
+					//If the length of the right flank is smaller than it is on the chromosome after the end of the gene
 					else {
 						organism.getGenes().get(i).getStop()[numderOfIntrons - 1] += rFlang1;
 					}
 					
-					//Длина гена с флангами
+					//Length of gene with flanks
 					dlinaGena = lFlang1 + dlinaGenaBezFl + rFlang1;
 					
-					//Массив для записи последовательности гена с флангами
+					//Array for recording gene sequences with flanks
 					strNA = new char [dlinaGena];
 					int pozEx = 0;
 					
-					//Считывание последовательности гена из полного генома
+					//Reading a gene sequence from a complete genome
 					for (int j = 0; j < numderOfIntrons; j++) {
 						int dlinaEx = organism.getGenes().get(i).getStop()[j] - organism.getGenes().get(i).getStart()[j] + 1;
-						//Строка с последовательностью гена
+						//Gene sequence string
 						System.arraycopy(wholeGenome, organism.getGenes().get(i).getStart()[j] - 1, strNA, pozEx, dlinaEx);
 						pozEx += dlinaEx;
 					}
@@ -666,72 +666,72 @@ public class GBKFileExtractor extends Extractor {
 					}*/
 					
 				}
-				//Если ДНК кольцевая
+				//If the DNA is circular
 				else {
-					//Помещается ли правый фланг
+					//Does the right flank fit?
 					boolean rflng = false;
 					
-					//Длина гена с флангами
+					//Length of gene with flanks
 					dlinaGena = lFlang1 + dlinaGenaBezFl + rFlang1;
 					
-					//Массив для записи последовательности гена с флангами
+					//Array for recording gene sequences with flanks
 					strNA = new char [dlinaGena];
 					int pozEx = 0;
 					
-					//Если длина левого фланга меньше, чем есть на хромосоме до начала гена
+					//If the left flank is smaller than it is on the chromosome before the gene begins
 					if (strt > lFlang1) {
-						//Новая позиция старта с учетом флангов
+						//New starting position with the flanks in mind
 						organism.getGenes().get(i).getStart()[0] -= lFlang1;
 					}
-					//Если длина левого фланга больше, чем есть на хромосоме до начала гена
+					//If the left flank is longer than it is on the chromosome before the gene begins
 					else {
-						//Длина недостающей последовательности до полной длины фланга
+						//Length of missing sequence to full flank length
 						int lenght = lFlang1 - strt + 1;
 						
-						//Запись недостающей последовательности с другого (правого) края кольцевой хромосомы
-						//Строка с последовательностью гена
+						//Recording the missing sequence from the other (right) edge of the ring chromosome
+						//Gene sequence string
 						System.arraycopy(wholeGenome, genomeSize - lenght, strNA, 0, lenght);
 						organism.getGenes().get(i).getStart()[0] = 1;
 						pozEx = lenght;
 					}
 					
-					//Если длина правого фланга меньше, чем есть на хромосоме после конца гена
+					//If the length of the right flank is smaller than it is on the chromosome after the end of the gene
 					if (stp1 < 0) {
-						//Новая позиция конца с учетом флангов;
+						//New end position, taking into account the flanks;
 						organism.getGenes().get(i).getStop()[numderOfIntrons - 1] += rFlang1;
 					}
-					//Если длина правого фланга больше, чем есть на хромосоме после конца гена
+					//If the right flank is longer than it is on the chromosome after the end of the gene
 					else {
 						organism.getGenes().get(i).getStop()[numderOfIntrons - 1] = genomeSize;
 						rflng = true;
 					}
 					
-					//Считывание последовательности гена из полного генома
+					//Reading a gene sequence from a complete genome
 					for (int j = 0; j < numderOfIntrons; j++) {
 						int dlinaEx = organism.getGenes().get(i).getStop()[j] - organism.getGenes().get(i).getStart()[j] + 1;
-						//Строка с последовательностью гена
+						//Gene sequence string
 						System.arraycopy(wholeGenome, organism.getGenes().get(i).getStart()[j] - 1, strNA, pozEx, dlinaEx);
 						pozEx += dlinaEx;
 					}
 					
-					//Если правый фланг не поместился на хромосоме, запись недостающей последовательности с другого (левого) края кольцевой хромосомы
+					//If the right flank does not fit on the chromosome, the missing sequence is recorded from the other (left) edge of the ring chromosome.
 					if (rflng) {
-						//Строка с последовательностью гена
+						//Gene sequence string
 						System.arraycopy(wholeGenome, 0, strNA, pozEx, stp1);
 					}
 				}
 				
-				//Если ген в комплементарной цепи
+				//If the gene is on the complementary strand
 				if (organism.getGenes().get(i).isComplement()) {
 					strNA = Auxiliary_Class.reversComplement(strNA);
 					//strNA2 = Auxiliary_Class.complement(strNA2);
 				}
 				
-				//Позиция начала гена без учета флангов
+				//The position of the beginning of the gene without taking into account the flanks
 				organism.getGenes().get(i).getStart()[0] = strt;
-				//Позиция конца гена без учета флангов
+				//The position of the end of the gene without taking into account flanks
 				organism.getGenes().get(i).getStop()[numderOfIntrons - 1] = stp;
-				//Запись последовательности гена
+				//Gene sequence recording
 				organism.getGenes().get(i).setNA(strNA);
 				//organism.genes.get(i).putNA2(strNA2);
 				
@@ -741,23 +741,23 @@ public class GBKFileExtractor extends Extractor {
 					rFlang1 = z;
 				}
 				
-				//Запись длины гена с флангами
+				//Recording the length of a gene with flanks
 				organism.getGenes().get(i).putLenght(lFlang1, dlinaGenaBezFl, rFlang1, dlinaGena);
 				
-				//Пометка для удаления коротких генов
+				//Marking to remove short genes
 				if (dlinaGenaBezFl < parameters.getMinLenGen()) {
 					organism.getGenes().get(i).setFlagUse(false);
 					organism.addShortGene();
 					//System.out.println("Gene number "+organism.genes.get(i).getNumber()+" ("+organism.genes.get(i).getName()+") was deleted because of its small length!");
 				}
 				
-				//Пометка для удаления псевдо генов
+				//Marking to remove pseudogenes
 				if (!parameters.isUsePseudoGenes() && organism.getGenes().get(i).isPseudo()) {
 					organism.getGenes().get(i).setFlagUse(false);
 				}
 			}
 			
-			//Создание файла с полной геномной последовательностью
+			//Creating a file with complete genomic sequence
 			printWholeGenome(organism, wholeGenome, gccom);
 		} catch (IOException e) {
 			e.printStackTrace();

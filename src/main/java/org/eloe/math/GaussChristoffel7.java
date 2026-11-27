@@ -2,10 +2,10 @@ package org.eloe.math;
 
 //Integral calculation by Gauss-Christoffel method with roots of Legendre polynomials in power 7
 public class GaussChristoffel7 extends Integral {
-	//Корни полинома Лежандра степени 7
+	//Roots of the degree-7 Legendre polynomial
 	public static final double X[] = {-0.9491079123427585, -0.7415311855993945, -0.4058451513773972, 0.0000000000000000, 
 		0.4058451513773972, 0.7415311855993945, 0.9491079123427585};
-	//Весовые коэффициенты 7s
+	//Weights for the 7-point rule
 	public static final double A[] = {0.1294849661688697, 0.2797053914892766, 0.3818300505051189, 0.4179591836734694, 
 		0.3818300505051189, 0.2797053914892766, 0.1294849661688697};
 		

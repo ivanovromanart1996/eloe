@@ -10,7 +10,7 @@ import org.eloe.organism.Gene;
 import org.eloe.organism.Organism;
 import org.eloe.parameters.PProcessing;
 
-//Класс для удаления из списка "плохих" генов
+//Removal from the list of “bad” genes
 public abstract class Processing {
 	
 	private static final Logger LOG = Logger.getLogger(Processing.class);
@@ -19,11 +19,11 @@ public abstract class Processing {
 		int badGenes = 0;
 		int ribGenes = 0;
 		
-		//Удаление генов со значками "n"
+		//Remove genes marked with "n".
 		for (int i = 0; i < organism.getGenes().size(); i++) {
 			if (organism.getGenes().get(i).isFlagUse()) {
 				if (organism.getGenes().get(i).getNAString().contains("n")) {
-					//Отметка гена, как неиспользуемого
+					//Marking a gene as unused
 					organism.getGenes().get(i).setFlagUse(false);
 					if (organism.getGenes().get(i).isRibosomal()) {
 						ribGenes++;
@@ -35,17 +35,17 @@ public abstract class Processing {
 		}
 		
 		if (parameters.isCheckStart() || parameters.isDeleteGwBC() || parameters.isCheckStop()) {
-			//Заполнение карты стартовыми кодонами
+			//Filling the map with start codons
 			Set<String> setStart = new HashSet<String>(parameters.getStartCodons().length);
 			for (int j = 0; j < parameters.getStartCodons().length; j++) {
 				setStart.add(parameters.getStartCodons()[j].trim());
 			}
-			//Заполнение карты "плохими" кодонами
+			//Filling the map with bad codons
 			Set<String> setMiddle = new HashSet<String>(parameters.getMidlCodons().length);
 			for (int j = 0; j < parameters.getMidlCodons().length; j++) {
 				setMiddle.add(parameters.getMidlCodons()[j].trim());
 			}
-			//Заполнение карты стоп-кодонами
+			//Filling the map with stop codons
 			Set<String> setStop = new HashSet<String>(parameters.getStopCodons().length);
 			for (int j = 0; j < parameters.getStopCodons().length; j++) {
 				setStop.add(parameters.getStopCodons()[j].trim());
@@ -53,9 +53,9 @@ public abstract class Processing {
 			
 			for (int i = 0; i < organism.getGenes().size(); i++) {
 				if (organism.getGenes().get(i).isFlagUse()) {
-					//Длина гена без флангов
+					//Gene length without flanks
 					int lenght = organism.getGenes().get(i).getLength();
-					//Для последовательности гена без флангов
+					//For gene sequence without flanks
 					char gene[] = organism.getGenes().get(i).getNA();
 					
 					char c[] = new char[3];
@@ -64,9 +64,9 @@ public abstract class Processing {
 					if (parameters.isCheckStart()) {
 						System.arraycopy(gene, 0, c, 0, 3);
 						codon = String.valueOf(c);
-						//Проверка наличия в начале гена стартового кодона
+						//Testing for the presence of a starting codon at the beginning of the gene
 						if (!setStart.contains(codon)) {
-							//Отметка гена, как неиспользуемого
+							//Marking a gene as unused
 							organism.getGenes().get(i).setFlagUse(false);
 							if (organism.getGenes().get(i).isRibosomal()) {
 								ribGenes++;
@@ -77,14 +77,14 @@ public abstract class Processing {
 					}
 					
 					if (parameters.isDeleteGwBC()) {
-						//Число кодонов в гене без последнего
+						//Number of codons in a gene without the last
 						int codons = organism.getGenes().get(i).getCodonsNumber()-1;
 						for (int j = 1; j < codons; j++) {
 							System.arraycopy(gene, 3*j, c, 0, 3);
 							codon = String.valueOf(c);
-							//Проверка наличия в середине гена плохого кодона
+							//Checking for a bad codon in the middle of a gene
 							if (setMiddle.contains(codon)) {
-								//Отметка гена, как неиспользуемого
+								//Marking a gene as unused
 								organism.getGenes().get(i).setFlagUse(false);
 								if (organism.getGenes().get(i).isRibosomal()) {
 									ribGenes++;
@@ -99,9 +99,9 @@ public abstract class Processing {
 					if (parameters.isCheckStop()) {
 						System.arraycopy(gene, lenght-3, c, 0, 3);
 						codon = String.valueOf(c);
-						//Проверка наличия на конце гена стоп-кодона
+						//Check for the presence of a stop codon at the end of the gene
 						if (!setStop.contains(codon)) {
-							//Отметка гена, как неиспользуемого
+							//Marking a gene as unused
 							organism.getGenes().get(i).setFlagUse(false);
 							if (organism.getGenes().get(i).isRibosomal()) {
 								ribGenes++;
@@ -114,7 +114,7 @@ public abstract class Processing {
 			}
 		}
 		
-		//Удаление из списка всех помеченных генов
+		//Removal from the list of all tagged genes
 		int counterDeletGenes = 0;
 		for (int i = 0; i < organism.getGenes().size(); i++) {
 			if (!organism.getGenes().get(i).isFlagUse()) {
@@ -129,12 +129,12 @@ public abstract class Processing {
 		if (parameters.isUsePseudoGenes()) {
 			pseudogenes = 0;
 		}
-		//Сообщение о количестве удаленных рибосомных генов
-		//Сообщение о том, что короткие гены были удалены
-		//Сообщение о том, что псевдо гены были удалены
-		//Сообщение о том, что плохие гены были удалены
-		//Сообщение об общем количестве удаленных генов
-		//Сообщение о количестве генов, участвующих в расчетах
+		//Reporting the number of removed ribosomal genes
+		//Report that short genes have been removed
+		//Report that pseudogenes have been removed
+		//Report that bad genes have been removed
+		//Report of total number of deleted genes
+		//Reporting the number of genes involved in the calculations
 		LOG.info(ribGenes+" ribosomal genes were deleted!\n"
 				+organism.getShortGenesNumber()+" short genes were deleted!\n"
 				+pseudogenes+" pseudogenes were deleted!\n"

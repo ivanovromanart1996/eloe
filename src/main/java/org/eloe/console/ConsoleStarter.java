@@ -11,7 +11,7 @@ import org.eloe.parameters.ParametersStructure;
 
 /**
  * @author yasana
- * Пусковик из консоли
+ * Command-line entry point
  */
 public class ConsoleStarter {
 
@@ -56,7 +56,7 @@ public class ConsoleStarter {
 			use = args[0];
 			res = args[1];
 		}
-		//Строим абсолютные пути, находя нужные папки
+		//Resolve the absolute paths of the input and output directories.
 		final Path usePath = currentDirectory.resolve(use);
 		final Path resPath = currentDirectory.resolve(res);
 		if (Files.notExists(usePath)) {

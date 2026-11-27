@@ -2,23 +2,23 @@ package org.eloe.organism;
 import java.util.List;
 import java.util.ArrayList;
 
-public class Organism { //Класс, описывающий организм
+public class Organism { //Class describing the organism
 	
-	private String name; //Название организма
-	private int genomeSize = 0; //Размер генома в нуклеотидах
-	private int chromosomesNumber = 0; //Количество хромосом в организме
-	private int genesNumber = 0; //Количество генов в геноме
-	private int ribGenesNumber = 0; //Количество рибосомных генов в геноме
-	private int pseudoGenesNumber = 0; //Количество псевдогенов в геноме
-	private int shortGenesNumber = 0; //Количество коротких генов в геноме
-	private int tRnaGenesNumber = 0; //Количество копий генов тРНК в геноме
-	private int operonsNumber = 0; //Количество оперонов в геноме
-	private int gcNumber = 0; //Количество GC в геноме
-	private double gcComposition; //GC-состав генома
+	private String name; //Name of the organism
+	private int genomeSize = 0; //Genome size in nucleotides
+	private int chromosomesNumber = 0; //Number of chromosomes in the organism
+	private int genesNumber = 0; //Number of genes in the genome
+	private int ribGenesNumber = 0; //Number of ribosomal genes in the genome
+	private int pseudoGenesNumber = 0; //Number of pseudogenes in the genome
+	private int shortGenesNumber = 0; //Number of short genes in the genome
+	private int tRnaGenesNumber = 0; //Number of copies of tRNA genes in the genome
+	private int operonsNumber = 0; //Number of operons in the genome
+	private int gcNumber = 0; //Number of GCs in the genome
+	private double gcComposition; //GC composition
 	private boolean archaea = false;
-	private boolean eukaryota = false; //Эукариотический организм или нет
-	private int index = 1; //Индекс организма
-	private List<Gene> genes = new ArrayList<Gene>(100); //Список генов организма
+	private boolean eukaryota = false; //Eukaryotic organism or not
+	private int index = 1; //Organism index
+	private List<Gene> genes = new ArrayList<Gene>(100); //List of genes in the organism
 	
 	@Override
 	public String toString() {
@@ -52,10 +52,10 @@ public class Organism { //Класс, описывающий организм
 		this.genes.addAll(chr.getGenes());
 	}
 		
-	//Разметка оперонов в прокариотическом организме
+	//Marking of operons in a prokaryotic organism
 	public void markCistrons() {
 		if (!this.eukaryota) {
-			//Первый ген - это первый цистрон
+			//The first gene is the first cistron.
 			this.genes.get(0).setFirstCistron(true);
 			for (int i = 1; i < this.genes.size()-1; i++) {
 				if (this.genes.get(i).getnOper() == this.genes.get(i-1).getnOper()) {
@@ -78,7 +78,7 @@ public class Organism { //Класс, описывающий организм
 				this.genes.get(this.genes.size()-1).setFirstCistron(true);
 				this.genes.get(this.genes.size()-2).setLastCistron(true);
 			}
-			//Последний ген - это последний цистрон
+			//The last gene is the last cistron.
 			this.genes.get(this.genes.size()-1).setLastCistron(true);
 		}
 	}

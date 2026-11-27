@@ -13,7 +13,7 @@ import org.apache.log4j.Logger;
 
 import org.eloe.organism.Gene;
 
-//Считает частоты кодонов
+//Counts the codon frequencies.
 
 public class FreqCounter {
 	
@@ -26,14 +26,14 @@ public class FreqCounter {
 			+ "\tttt,\tatc,\tatt,\tata,\tatg,\ttgg,\ttga,\ttaa,\ttag";
 	private static final String CODE_TXT = "code.txt";
 	
-	//Карта для кодонов и их позиций в массиве
+	//Map for codons and their positions in the array
 	private static Map<String, Integer> mapOfCodons;
 	private ICodonCompositionCalculator ccCalc;
 	
-	//Конструктор
+	//Constructor
 	public FreqCounter() throws IOException, NumberFormatException {
 		mapOfCodons = new HashMap<String, Integer>();
-		//Заполнение карты 64 кодонами и их позициями в массиве
+		//Filling the map with 64 codons and their positions in the array
 		BufferedReader reader = null;
 		try {
 			reader = new BufferedReader(new InputStreamReader(FreqCounter.class.getClassLoader()
@@ -61,7 +61,7 @@ public class FreqCounter {
 		ccCalc = new CodonCompositionCalculatorImpl(mapOfCodons);
 	}
 	
-	//TODO Расчет частот кодонов в гене с краевыми кодонами
+	//TODO Calculation of codon frequencies in a gene with edge codons
 	public void countFreq0(List<Gene> genes) {
 		for (Gene gene : genes) {
 			gene.setCodonComposition0(ccCalc.calculate(gene, 0, 0));
@@ -69,7 +69,7 @@ public class FreqCounter {
 		}
 	}
 
-	//TODO Расчет частот кодонов в гене без краевых кодонов
+	//TODO Calculation of codon frequencies in a gene without edge codons
 	public void countFreq(List<Gene> genes, int unUsedCodonsL, int unUsedCodonsR) {
 		for (Gene gene : genes) {
 			gene.setCodonComposition(ccCalc.calculate(gene, unUsedCodonsL, unUsedCodonsR));

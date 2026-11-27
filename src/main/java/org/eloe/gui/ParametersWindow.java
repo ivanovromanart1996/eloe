@@ -83,7 +83,7 @@ public class ParametersWindow extends JDialog {
 			tabbedPane.setBounds(0, 0, 444, 259);
 			tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 			contentPanel.add(tabbedPane);
-			//Вкладка "Extraction"
+			//Extraction tab
 			{
 				JPanel panelExtraction = new JPanel();
 				tabbedPane.addTab("Extraction", null, panelExtraction, null);
@@ -225,7 +225,7 @@ public class ParametersWindow extends JDialog {
 				usePseudoGenes.setSelected(psNew.usePseudoGenes);
 				panelExtraction.add(usePseudoGenes);
 			}
-			//Вкладка "Calculation"
+			//The Calculation tab.
 			{
 				JPanel panelCalculation = new JPanel();
 				tabbedPane.addTab("Calculation", null, panelCalculation, null);
@@ -321,7 +321,7 @@ public class ParametersWindow extends JDialog {
 				panelCalculation.add(PercentageOfGenes);
 				
 			}
-			//Вкладка "LCI"
+			//"LCI" tab
 			{
 				JPanel panelLCI = new JPanel();
 				tabbedPane.addTab("LCI", null, panelLCI, null);
@@ -431,7 +431,7 @@ public class ParametersWindow extends JDialog {
 				minloopEnergy.setColumns(10);
 				
 			}
-			//Вкладка "User"
+			//"User" tab
 			{
 				JPanel panelUser = new JPanel();
 				tabbedPane.addTab("User", null, panelUser, null);
@@ -442,7 +442,7 @@ public class ParametersWindow extends JDialog {
 					panelUser.add(lblHereWillBe);
 				}
 			}
-			//Вкладка "Results"
+			//"Results" tab
 			{
 				JPanel panelResults = new JPanel();
 				tabbedPane.addTab("Results", null, panelResults, null);
@@ -613,7 +613,7 @@ public class ParametersWindow extends JDialog {
 							}
 							//"User"
 							{
-								//Пока пусто
+								//Currently empty.
 							}
 							//"Results"
 							{
@@ -702,7 +702,7 @@ public class ParametersWindow extends JDialog {
 						}
 						//"User"
 						{
-							//Пока пусто
+							//Currently empty.
 						}
 						//"Results"
 						{
