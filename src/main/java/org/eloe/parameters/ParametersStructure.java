@@ -1,0 +1,56 @@
+package org.eloe.parameters;
+
+public class ParametersStructure {
+	public String context = "CDS ";
+	public int lFlang = 600;
+	public int lFlangTrue = 600;
+	public int rFlang = 600;
+	public int rFlangTrue = 600;
+	public int distBOper = 40;
+	public int minLenGen = 90;
+	public boolean checkStart = false;
+	public String[] startCodons = {"atg", "gtg", "ttg"};
+	public boolean deleteGwBC = false;
+	public String[] midlCodons = {"tag", "taa"};
+	public boolean checkStop = false;
+	public String[] stopCodons = {"tag", "taa"};
+	public boolean usePseudoGenes = false;
+	public boolean makeFileFreq = false;
+	public boolean makeFileWholeGenom = false;
+	public boolean searchOrthologs = false;
+	public int number_orthologs = 25;
+	public boolean autocounting = false;
+	public int maxNumbCod = 20;
+	public int unUseCodonsL1 = 1;
+	public int unUseCodonsR1 = 1;
+	public int smin1 = 3;
+	public int smax1 = 6;
+	public int lmin1 = 3;
+	public int lmax1 = 50;
+	public int smin2 = 3;
+	public int smax2 = 6;
+	public int lmin2 = 3;
+	public int lmax2 = 50;
+	public double minloopEnergy = 0.0;
+	public boolean countLCIij = false;
+	public boolean countRepeatsInGenes = false;
+	public boolean showRibPos = false;
+	public boolean number_percentage = true;
+	public int teachingGenesNumber = 150;
+	public int teachingGenesPercentage = 10;
+	public double minKc = 0.1;
+	public double ve = 1.;
+	public int forSigma1 = 2;
+	public int forSigma2 = 2;
+	public boolean useUserParam1 = false;
+	public double m11 = 1.;
+	public double sigma11 = 0.1;
+	public double m22 = 1.;
+	public double sigma22 = 0.1;
+	public boolean useUserParam2 = false;
+	public double tmin1 = 0.1;
+	public double tmax1 = 1.;
+	public boolean useRibGenesAsHighExpressed1 = true;
+	public boolean useOtherGenesAsHighExpressed1 = false;
+	
+}
