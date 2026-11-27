@@ -26,8 +26,8 @@ public class ConsoleTask implements Runnable {
 	@Override
 	public void run() {
 		try {
-			JTextArea consoleStub = new JTextArea();//заглушка, которая по-большому счёту нам и не нужна
-			//UPD: проверила код. Не должно быть проблем от использования этой заглушки
+			JTextArea consoleStub = new JTextArea();//Placeholder text area for the engine.
+			//UPD: The code was checked and this placeholder should be safe to use.
 			EEIEngine.engine(ps, sourceFolder, resultFolder, consoleStub);
 		} catch (NumberFormatException e) {
 			e.printStackTrace();

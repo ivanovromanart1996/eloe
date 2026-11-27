@@ -28,12 +28,12 @@ public abstract class Auxiliary_Class {
 	public static int[] ribpozition(List<Gene> l, int ribgenes, File fileRibPos) {
 		int[] djmass = {0, 0};
 		
-		//Если есть рибосомные гены
+		//If there are ribosomal genes
 		if (ribgenes > 0) {
-			//Массив позиций рибосомных генов
+			//Array of positions of ribosomal genes
 			int ribPozMass[] = new int[ribgenes];
 			int j = 0;
-			//Центр группы рибосомных генов
+			//Center of the ribosomal gene group
 			int ng = 0;
 			for (int i = 0; i < l.size(); i++) {
 				if (l.get(i).isRibosomal()) {
@@ -42,18 +42,18 @@ public abstract class Auxiliary_Class {
 					ng += (i+1);
 				}
 			}
-			//Центр группы рибосомных генов
+			//Center of the ribosomal gene group
 			double m = (double)ng/ribgenes;
-			//Среднее отклонение группы рибосомных генов от центра
+			//Average deviation of ribosomal genes from the center
 			double r = 0;
 			for (int i = 0; i < ribgenes; i++) {
 				r += Math.pow((ribPozMass[i]-m), 2);
 			}
 			r = Math.sqrt(r/ribgenes);
 			
-			//Центр группы рибосомных генов (отмасштабированный)
+			//Center of the ribosomal gene group (scaled)
 			int dj = (int)Math.round(100*(2*m-l.size()-1)/(l.size()-ribgenes));
-			//Среднее отклонение группы рибосомных генов от центра (отмасштабированное)
+			//Average deviation of ribosomal genes from the center (scaled)
 			int djr = (int)Math.round(100*(2*r-ribgenes-1)/(l.size()-ribgenes));
 			
 			/*
@@ -61,7 +61,7 @@ public abstract class Auxiliary_Class {
 			int djr = (int)Math.round(200*(r-1)/(l.size()-1));
 			*/
 			
-			//фортран
+			//Fortran
 			/*double djr1 = 0;
 			double dj1 = (2*m-l.size()-1)/(l.size()-1);
 			double hh = 0;
@@ -76,7 +76,7 @@ public abstract class Auxiliary_Class {
 			djmass[0] = dj;
 			djmass[1] = djr;
 			
-			//Запись файла с позициями рибосомных генов
+			//Record file with positions of ribosomal genes
 			PrintStream outRibPoz = null;
 			try {
 				outRibPoz = new PrintStream(
@@ -93,7 +93,7 @@ public abstract class Auxiliary_Class {
 					outRibPoz.close();
 				}
 			}
-		} else { //Если нет рибосомных генов
+		} else { //If there are no ribosomal genes
 			PrintStream out;
 			try {
 				out = new PrintStream(fileRibPos);
@@ -107,7 +107,7 @@ public abstract class Auxiliary_Class {
 		return djmass;
 	}
 	
-	//TODO Считывание из файла позиций рибосомных генов
+	//TODO Reading from the ribosomal gene positions file
 	public static int[] ribosomsPositions(String ribpoz) {
 		String[] as = ribpoz.split("\t");
 		int[] aa = new int[as.length];
@@ -117,11 +117,11 @@ public abstract class Auxiliary_Class {
 		return aa;
 	}
 	
-	//TODO Создание комплементарной последовательности
+	//TODO Creating Complementary Sequences
 	public static char[] reversComplement(final char[] na) {
-		//Длина гена
+		//Gene length
 		int geneLength = na.length;
-		//Последовательность гена
+		//Gene sequence
 		char[] naReversComplement = new char[geneLength];
 		
 		for (int j = 0; j < geneLength; j++) {
@@ -137,17 +137,17 @@ public abstract class Auxiliary_Class {
 		return naReversComplement;
 	}
 	
-	//TODO Время просчета
+	//TODO Computation time
 	public static long time(final String s, final long t) {
 		long time = System.currentTimeMillis()-t;
 		LOG.info("Operating period ("+s+"): "+time+" millisec");
 		return System.currentTimeMillis();
 	}
 	
-	//TODO Автоподбор флангов
+	//TODO Automatic flank selection
 	public static void flangSizeAutocounting(PAutoCounting parameters, Organism organism, int number2, FreqCounter freq) {
 		if (parameters.isAutocounting()) {			
-			//Для подбора количества кодонов, не учитываемых на флангах генов
+			//To select the number of codons that are not considered on the flanks of genes
 			int mmm[][] = new int [parameters.getMaxNumbCod()+1][2];
 			
 			for (int i = 0; i <= parameters.getMaxNumbCod(); i++) {
@@ -168,14 +168,14 @@ public abstract class Auxiliary_Class {
 				}
 			}
 			
-			//Число неучитываемых кодонов на флангах
+			//Number of excluded codons in the flanks
 			parameters.setUnUseCodonsL1(maxind);
 			parameters.setUnUseCodonsR1(maxind);
 			LOG.info("Automatical count of number of unrecorded codons on the genes edges. n = " + maxind);
 		}
 	}
 	
-	//TODO Определение индекса с максимальным значением M и минимальным R
+	//TODO Determination of an index with a maximum value of M and a minimum value of R
 	public static int indexCounter(int[][] mr) {
 		int index = 0;
 		int m = -101;
@@ -192,9 +192,9 @@ public abstract class Auxiliary_Class {
 		return index;
 	}
 	
-	//TODO Графический вывод положения рибосомных генов
+	//TODO Plot ribosomal gene positions.
 	public static void ribPosGraphic(File fileRibPoz, Organism organism) throws IOException {
-		//Считывание файла с позициями рибосомных генов
+		//Reading a file with positions of ribosomal genes
 		BufferedReader readerRibPoz = new BufferedReader(new FileReader(fileRibPoz));
 		String ribpoz = readerRibPoz.readLine();
 		
@@ -212,9 +212,9 @@ public abstract class Auxiliary_Class {
 			ribpoz = readerRibPoz.readLine();
 			readerRibPoz.close();
 				
-			//Создание окна с графическим отображением расположения рибосомных генов
+			//Creating a window with a graphical display of the location of ribosomal genes
 			if (fileRibPoz.canRead()) {
-				//Отображение положения рибосомных генов
+				//Displaying the position of ribosomal genes
 				final GraphOfRibPoz f = new GraphOfRibPoz("Positions of ribosomal genes in " + organism.getName(), organism.getGenesNumber(), aa, bb, cc, dd, ee);
 				f.addWindowListener(new WindowAdapter() {
 					public void windowClosing(final WindowEvent ev) {
@@ -225,12 +225,12 @@ public abstract class Auxiliary_Class {
 		}
 	}
 	
-	//Костыль для вывода профилей LCI для вирусов
+	//Workaround for displaying LCI profiles for viruses
 	//Number\teei + ("number_eei")
 	public static void numberEEItoFile(Organism organism, File resultFolder1) {
 		PrintStream outGenesAndFlangs6 = null;
 		int index = organism.getIndex();
-		//Запись файла с Number и EEI
+		//Record a file with Number and EEI
 		File fileGenesAndFlangs6 = new File(resultFolder1, organism.getName() + "_number_eei.txt");
 		try {
 			outGenesAndFlangs6 = new PrintStream(fileGenesAndFlangs6);
@@ -270,19 +270,19 @@ public abstract class Auxiliary_Class {
 		}
 	}
 	
-	//TODO Запись результатов в файлы
+	//TODO Record the results in files
 	public static void resultsToFiles(Organism organism, PGeneToString parameters, File resultFolder1, List<String> files) {
 		int index = organism.getIndex();
 		
-		boolean out1 = false; //">Number\tLocus_tag\tFBid\tComplement\tEEi" (Левицкому дрозофила) ("genes_and_flangs1")
-		boolean out2 = true; //"#\tlocus_tag\tprotein_id\tgene_id\tgene_name\tCOG\tEEI" (Брагину Анатолию) + (и мне!) ("eei+(index+1)") Обязательный вывод файла из-за files
+		boolean out1 = false; //">Number\tLocus_tag\tFBid\tComplement\tEEi" (Drosophila for Levitsky) ("genes_and_flangs1")
+		boolean out2 = true; //"#\tlocus_tag\tprotein_id\tgene_id\tgene_name\tCOG\tEEI" (for Anatoly Bragin and me) ("eei+(index+1)") Required because files depends on this output
 		boolean out3 = true; //All, l.get(i).toString()\nl.get(i).getNA ("genes_and_flangs3")
 		boolean out4 = false; //"locus_tag\tEEI1\tEEI2\tEEI3\tEEI4\tEEI5\tIndex=" ("locus_tag_eei12345")
 		boolean out5 = false; //("fbid_locus_tag")
 		boolean out6 = true; //Number\teei + ("number_eei")
-		boolean out7 = false; //>locus_tag\nstrNA2 (Левицкому дрожжи)
-		boolean out8 = false; //locus_tag\EEI (Левицкому дрожжи)
-		boolean out9 = true; //>locus_tag|EEI\nNA  (.fasta для Наташи, студентки Орлова)
+		boolean out7 = false; //>locus_tag\nstrNA2 (yeast for Levitsky)
+		boolean out8 = false; //locus_tag\EEI (yeast for Levitsky)
+		boolean out9 = true; //>locus_tag|EEI\nNA (.fasta for Natasha, Orlov’s student)
 					
 		PrintStream outGenesAndFlangs1 = null;
 		PrintStream outGenesAndFlangs2 = null;
@@ -297,13 +297,13 @@ public abstract class Auxiliary_Class {
 		try {
 			//1
 			if (out1) {
-				//Запись файла с последовательностями генов+флангов с их названиями и названиями продуктов
+				//Record a file with gene + flank sequences with their names and product names
 				File fileGenesAndFlangs1 = new File(resultFolder1, organism.getName() + "_genes_and_flanks1.txt");
 				outGenesAndFlangs1 = new PrintStream(fileGenesAndFlangs1);
 			}
 			//2
 			if (out2) {
-				//Запись файла с последовательностями генов+флангов с их названиями и названиями продуктов
+				//Record a file with gene + flank sequences with their names and product names
 				File fileGenesAndFlangs2 = new File(resultFolder1, organism.getName() + "_eei" + (index + 1) + ".txt");
 				outGenesAndFlangs2 = new PrintStream(fileGenesAndFlangs2);
 				outGenesAndFlangs2.println("#\t##\tlocus_tag\tprotein_id\tgene_id\tgene_name\tCOG\tEEI");
@@ -311,47 +311,47 @@ public abstract class Auxiliary_Class {
 			}			
 			//3
 			if (out3) {
-				//Запись файла с последовательностями генов+флангов с их названиями и названиями продуктов
+				//Record a file with gene + flank sequences with their names and product names
 				File fileGenesAndFlangs3 = new File(resultFolder1, organism.getName() + "_genes_and_flanks.txt");
 				outGenesAndFlangs3 = new PrintStream(fileGenesAndFlangs3);
 				//outGenesAndFlangs3.println("Number\tlocus_tag\tgene_poz\t/gene=\t/product=\t/note=\t/position=\t/lenght=\t/codons=\t/complement=\tGC-compoz=\t/EEI=");
 			}
 			//4
 			if (out4) {
-				//Запись файла с locus_tag и EEI
+				//File recording with locus_tag and EEI
 				File fileGenesAndFlangs4 = new File(resultFolder1, organism.getName() + "_locus_tag_eei12345.txt");
 				outGenesAndFlangs4 = new PrintStream(fileGenesAndFlangs4);
 				outGenesAndFlangs4.println("locus_tag\tEEI1\tEEI2\tEEI3\tEEI4\tEEI5\tIndex=" + (index + 1));
 			}
 			//5
 			if (out5) {
-				//Запись файла с FBid и locus_tag
+				//File recording with FBid and locus_tag
 				outGenesAndFlangs5 = new PrintStream(resultFolder1, organism.getName() + "_fbid_locus_tag.txt");
 				outGenesAndFlangs5.println("Number\tlocus_tag\tFBid\tgene_poz_start\tgene_poz_stop\tcdsStart\tcdsStop\tcomplement\tEEI\tgeneNA");
 			}
 			//6
 			if (out6) {
-				//Запись файла с Number и EEI
+				//Record a file with Number and EEI
 				File fileGenesAndFlangs6 = new File(resultFolder1, organism.getName() + "_number_eei.txt");
 				outGenesAndFlangs6 = new PrintStream(fileGenesAndFlangs6);
 				outGenesAndFlangs6.println("number\tsingle\tfirst\tmiddle\tlast\tEEI"+(index+1));
 			}
 			//7
 			if (out7) {
-				//Запись файла с Number и EEI
+				//Record a file with Number and EEI
 				File fileGenesAndFlangs7 = new File(resultFolder1, organism.getName() + "_locus_tag_strNA2.txt");
 				outGenesAndFlangs7 = new PrintStream(fileGenesAndFlangs7);
 			}
 			//8
 			if (out8) {
-				//Запись файла с Number и EEI
+				//Record a file with Number and EEI
 				File fileGenesAndFlangs8 = new File(resultFolder1, organism.getName() + "_locus_tag_EEI.txt");
 				outGenesAndFlangs8 = new PrintStream(fileGenesAndFlangs8);
 				outGenesAndFlangs8.println("locus_tag\tEEI");
 			}
 			//9
 			if (out9) {
-				//Запись файла с Number и EEI
+				//Record a file with Number and EEI
 				File fileGenesAndFlangs9 = new File(resultFolder1, organism.getName() + "_locus_tag_EEI_2.fasta");
 				outGenesAndFlangs9 = new PrintStream(fileGenesAndFlangs9);
 			}
@@ -368,7 +368,7 @@ public abstract class Auxiliary_Class {
 								"\t" + organism.getGenes().get(i).getFbID() +
 								"\t" + (organism.getGenes().get(i).isComplement() == true ? "-" : "+") +
 								"\t" + organism.getGenes().get(i).getEeiMass()[index]);
-						outGenesAndFlangs1.println(organism.getGenes().get(i).getNaWithFlanks()); //Было NA2
+						outGenesAndFlangs1.println(organism.getGenes().get(i).getNaWithFlanks()); //Previously NA2
 					}
 				}
 				
@@ -423,7 +423,7 @@ public abstract class Auxiliary_Class {
 				//7
 				if (out7 && organism.getGenes().get(i).isFlagOut()) {
 					outGenesAndFlangs7.println(">" + organism.getGenes().get(i).getLocusTag());
-					outGenesAndFlangs7.println(organism.getGenes().get(i).getNaWithFlanks()); //Было NA2
+					outGenesAndFlangs7.println(organism.getGenes().get(i).getNaWithFlanks()); //Previously NA2
 				}
 				
 				//8
@@ -502,7 +502,7 @@ public abstract class Auxiliary_Class {
 		}
 	}
 	
-	//TODO Запись файла с 5 индексами EEI
+	//TODO Record a file with 5 EEI indexes
 	public static void outEEI(File resultFolder1, Organism organism) {
 		File fileIndexEEI = new File(resultFolder1, organism.getName()+"_all.txt");
 		PrintStream outEEI = null;
@@ -510,7 +510,7 @@ public abstract class Auxiliary_Class {
 			outEEI = new PrintStream(fileIndexEEI);
 			
 			for (int ind = 0; ind < 5; ind++) {
-				//Сортировка по убыванию EEI ind
+				//Sort by descending EEI index.
 				Sorter.sortupEEIN(organism, ind+1);
 				outEEI.println("Index = "+(ind+1));
 				outEEI.println("#\tNumber\tEEI\tlocus_tag\tName\tProt\tNote");

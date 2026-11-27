@@ -31,7 +31,7 @@ public class Orthologs {
 			PrintStream out = null;
 			try {
 				out = new PrintStream(result_file);
-				//Для удаления уже имеющихся записей
+				//Delete existing records
 				out.print("");
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -43,15 +43,15 @@ public class Orthologs {
 			
 			for (int i = 0; i < files.size()-1; i++) {
 				String first = files.get(i);
-				//Список имен генов первого организма
+				//List of names of genes of the first organism
 				List<String> first_organism = readGeneNames(first);
-				//Имя первого организма
+				//Name of the first organism
 				String first_organism_name = first.substring(first.lastIndexOf(File.separator)+1);
 				for (int j = i+1; j < files.size(); j++) {
 					String second = files.get(j);
-					//Список имен генов второго организма
+					//List of names of genes of the second organism
 					List<String> second_organism = readGeneNames(second);
-					//Имя второго организма
+					//Name of the second organism
 					String second_organism_name = second.substring(second.lastIndexOf(File.separator)+1);
 					orthologs(first_organism, second_organism, first_organism_name, second_organism_name, result_file, parameters.getNumber_orthologs());
 				}
@@ -66,9 +66,9 @@ public class Orthologs {
 			out = new PrintStream(new BufferedOutputStream(new FileOutputStream(result_file, true)));
 			out.println(first_organism_name+": "+first_organism.size());
 			out.println(second_organism_name+": "+second_organism.size());
-			//Поиск ортологов из первого организма во втором
+			//Find orthologs of the first organism in the second.
 			searchOrth(first_organism, second_organism, first_organism_name, second_organism_name, n, out);
-			//Поиск ортологов из второго организма в первом
+			//Find orthologs of the second organism in the first.
 			searchOrth(second_organism, first_organism, second_organism_name, first_organism_name, n, out);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -89,14 +89,14 @@ public class Orthologs {
 		int counter = 0;
 		
 		for (int i = 0; i < n; i++) {
-			//Если имя гена != "" и второй организм содержит ген с таким именем
+			//If the gene name is nonempty and the second organism has a gene with that name
 			if (!first_organism.get(i).equals("-") && second_organism.contains(first_organism.get(i))) {
-				//Записываем позицию гена во втором организме
+				//Record the position of the gene in the second organism
 				int poz = second_organism.indexOf(first_organism.get(i))+1;
 				counter++;
 				sum += poz;
 				sumsq += poz*poz;
-				//Выводим позиции гена в первом и втором организме
+				//Gene positions in the first and second organism
 				out.println((i+1)+"\t"+(i+1)+"\t"+poz+"\t"+first_organism.get(i));
 			}
 		}
@@ -120,7 +120,7 @@ public class Orthologs {
 	}
 
 	private static List<String> readGeneNames(String org) {		
-		//Считывание файла с данными по организму
+		//Read the file containing organism data.
 		List<String> second_organism = new ArrayList<String>();
 		
 		BufferedReader reader = null;
@@ -130,7 +130,7 @@ public class Orthologs {
 			String line;
 			while ((line = reader.readLine()) != null) {
 				String[] mass = line.split("\t");
-				//Считывание имени гена (шестой столбец в строке)
+				//Reading a gene name (sixth column in a row)
 				second_organism.add(mass[5].toLowerCase());
 			}
 		} catch (IOException e) {

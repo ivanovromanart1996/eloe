@@ -16,37 +16,37 @@ public abstract class Te_Counter {
 	
 	private static final Logger LOG = Logger.getLogger(Te_Counter.class);
 	
-	//Вычисление P_i
+	//Computation of P_i
 	public static void countTei(List<Gene> l, double m, double sigma, boolean x) {
-		//m - среднее значение LCI, sigma - среднее отклонение LCI от среднего
-		double k = m/sigma/sigma; //Параметр k
-		double n = m*k; //Параметр n
+		//m is the mean value of LCI, sigma is the mean deviation of LCI from the mean
+		double k = m/sigma/sigma; //Parameter k
+		double n = m*k; //Parameter n
 		
 		if (n > 168) {
 			System.out.println("Danger! Gamma function may lead to overflow of type Double! (x32 bit pricessors)");
 			LOG.fatal("Warning! Gamma function may lead to overflow of type Double! (x32 bit pricessors)");
 			return;
 		}
-		//Гамма функция G(n+1)
+		//Gamma function G(n+1)
 		double g = GammaFunction.calculate(n+1);
 		
 		//When change function, change integration limits
 		Function f = new SigmaFunction2(n);
 		Integral integral = new GaussChristoffel7();
-		//Tочность вычисления интеграла
+		//Accuracy of calculation of integral
 		double epsilon = 1e-8;
 		
-		//Если без учета энергии шпильки
+		//If hairpin energy is excluded
 		if (!x) {
-			//Перебор массива генов и подсчет интеграла для каждого
+			//Searching the array of genes and counting the integral for each
 			for (int i = 0; i < l.size(); i++){
 				double pi1 = integral.calculate(0, k*l.get(i).getLci1(), f, epsilon)/g;
 				l.get(i).setPi1(pi1);
 			}
 		}
-		//Если с учетом энергии шпильки
+		//If hairpin energy is included
 		else {
-			//Перебор массива генов и подсчет интеграла для каждого
+			//Searching the array of genes and counting the integral for each
 			for (int i = 0; i < l.size(); i++){
 				double pi2 = integral.calculate(0, k*l.get(i).getLci2(), f, epsilon)/g;
 				l.get(i).setPi2(pi2);
@@ -54,28 +54,28 @@ public abstract class Te_Counter {
 		}
 	}
 
-	//Вычисление Te(i)
+	//Calculation of Te(i)
 	public static void tei(List<Gene> l, double tmin, double tmax, boolean x, boolean useUserParam2, double tmin1, double tmax1) {
 		if (useUserParam2) {
 			tmin = tmin1;
 			tmax = tmax1;
 		}
-		//Без энергии
+		//Without energy
 		if (!x) {
 			for (int i = 0; i < l.size(); i++){
-				//Вероятность, вычисленная из среднего и отклонения LCI1
+				//Probability calculated from the mean and deviation of LCI1
 				double p = l.get(i).getPi1();
-				//Вычисление Te(i)
+				//Calculation of Te(i)
 				double tei = tmin*(1-p)+tmax*p;
 				l.get(i).setTei(tei);
 			}
 		}
-		//С энергией
+		//With energy
 		else {
 			for (int i = 0; i < l.size(); i++){
-				//Вероятность, вычисленная из среднего и отклонения LCI2
+				//Probability calculated from the mean and deviation of LCI2
 				double p = l.get(i).getPi2();
-				//Вычисление Te(i)
+				//Calculation of Te(i)
 				double tei = tmin*(1-p)+tmax*p;
 				l.get(i).setTei(tei);
 			}

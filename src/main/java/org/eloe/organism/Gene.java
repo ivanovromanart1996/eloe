@@ -2,31 +2,31 @@ package org.eloe.organism;
 
 import org.eloe.parameters.PGeneToString;
 
-// Класс нуклеотидной последовательности с параметрами: длина, последовательность, позиция начала, 
-// позиция конца, расположение в прямой или комплементарной цепи, принадлежность к рибосомальным генам.
+// Class representing a nucleotide sequence, with length, sequence, start position, 
+// end position, forward or complementary strand, and ribosomal status.
 public class Gene implements IGeneWithFlanks {
-	private int number; //Порядковый номер гена в геноме
-	private String name = "-"; //Название гена
-	private String locusTag; //Индекс гена
-	private String geneID; //Индекс гена
-	private String cog = "-"; //COG индекс
-	private String fbID; //id гена в FLYBASE
-	private String note; //Аннотация гена
-	private String proteinName; //Продукт гена
-	private String proteinID; //Индекс белка
-	private int length; //Длина гена без флангов
-	private int lengthWithFlanks; //Длина гена с флангами
-	private int leftFlankLength = 0; //Длина левого фланга
-	private int rightFlankLength = 0; //Длина правого фланга
-	private int codonsNumber; //Число кодонов без флангов
-	private int codonsWithFlanksNumber; //Число кодонов с флангами
-	private int[] start; //Начало гена
-	private int[] stop; //Конец гена
-	private boolean complement; //Комплемент
-	private boolean ribosomal = false; //Рибосомный или нет
+	private int number; //Gene sequence number in the genome
+	private String name = "-"; //Name of the gene
+	private String locusTag; //Gene index
+	private String geneID; //Gene index
+	private String cog = "-"; //COG index
+	private String fbID; //FlyBase gene ID
+	private String note; //Gene annotation
+	private String proteinName; //Gene product
+	private String proteinID; //protein index
+	private int length; //Gene length without flanks
+	private int lengthWithFlanks; //Length of gene with flanks
+	private int leftFlankLength = 0; //Length of left flank
+	private int rightFlankLength = 0; //Length of right flank
+	private int codonsNumber; //Number of codons without flanks
+	private int codonsWithFlanksNumber; //Number of codons with flanks
+	private int[] start; //Gene start
+	private int[] stop; //End of gene
+	private boolean complement; //Complement
+	private boolean ribosomal = false; //Whether the gene is ribosomal
 	private boolean pseudo = false;
-	private boolean highExpressed = false; //Высоко экспрессируемый или нет
-	private double gcComposition; //GC-состав гена
+	private boolean highExpressed = false; //Whether the gene is highly expressed
+	private double gcComposition; //GC composition
 	private int[] codonComposition0 = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 										0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 										0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
@@ -34,27 +34,27 @@ public class Gene implements IGeneWithFlanks {
 	private int[] codonComposition = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 			   							0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 			   							0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-			   							0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; //Массив для записи частот кодонов
-	private double tai = 0; //Индекс по частотам кодонов
-	private double lci1 = 0; //Индекс локальной комплементарности
-	private double lci2 = 0; //Индекс локальной комплементарности
-	private double pi1 = 0; //Вероятность в формуле для Te(i) без учета энергии
-	private double pi2 = 0; //Вероятность в формуле для Te(i) с учетом энергии
-	private double tei = 0; //Индекс по локальной комплементарности
-	private double eei = 0; //Индекс эффективности элонгации
-	private double[] eeiMass = {0, 0, 0, 0, 0}; //Все индексы eei1-eei5
-	private int repeats = 0; //Количество повторов в гене
-	private double[] lciij; //LCI индивидуального нуклеотида
-	private boolean flagUse = true; //Флаг использования
-	private boolean flagOut = true; //Флаг вывода в файл
-	private int nOper; //Номер оперона
+			   							0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; //Array for recording codon frequencies
+	private double tai = 0; //Codon frequency index
+	private double lci1 = 0; //Local Complementarity Index
+	private double lci2 = 0; //Local Complementarity Index
+	private double pi1 = 0; //Probability in the formula for Te(i) excluding energy
+	private double pi2 = 0; //Probability in the formula for Te(i) taking into account energy
+	private double tei = 0; //Local Complementarity Index
+	private double eei = 0; //Elongation efficiency index
+	private double[] eeiMass = {0, 0, 0, 0, 0}; //All eei1-eei5 indices
+	private int repeats = 0; //Number of repetitions in the gene
+	private double[] lciij; //LCI individual nucleotide
+	private boolean flagUse = true; //Flag of use
+	private boolean flagOut = true; //File output flag
+	private int nOper; //Operon number
 	private boolean firstCistron = false;
 	private boolean middleCistron = false;
 	private boolean lastCistron = false;
-	private char[] naWithFlanks; //Последовательность нуклеотидов
+	private char[] naWithFlanks; //nucleotide sequence
 	
-	//Конструктор
-	public Gene(int genes, int[] begining, int[] end, int nOper, boolean complement, boolean useGeneInCounting) { //Конструктор
+	//Constructor
+	public Gene(int genes, int[] begining, int[] end, int nOper, boolean complement, boolean useGeneInCounting) { //Constructor
 		this.number = genes;
 		this.start = begining;
 		this.stop = end;
@@ -64,17 +64,17 @@ public class Gene implements IGeneWithFlanks {
 	}
 	
 	//TODO
-	//Вывод данных
+	//Data output
 	public String toString(Organism organism, PGeneToString parameters) {
 		int rightFlang1 = (this.rightFlankLength <= parameters.getrFlangTrue()) ? this.rightFlankLength : parameters.getrFlangTrue();
 		int leftFlang1 = (this.leftFlankLength <= parameters.getlFlangTrue()) ? this.leftFlankLength : parameters.getlFlangTrue();
 		
 		StringBuilder a = new StringBuilder(">");
 		a.append(this.number).append("\t");
-//		if (this.rightFl != this.rFlangTrue || this.leftFl != this.lFlangTrue) { //Пометка "*", если другая длина фланга
+//		if (this.rightFl != this.rFlangTrue || this.leftFl != this.lFlangTrue) { //Mark with "*" if the flank length differs
 //			a+="*\t";
 //		}
-//		if (this.ribosomal) a.append("rib\t"); //Пометка "rib"
+//		if (this.ribosomal) a.append("rib\t"); //Mark with "rib"
 		if (!organism.isEukaryota()) {
 			a.append("N operona: ").append(this.nOper).append("\t");
 			if (this.firstCistron && this.lastCistron) a.append("first-last\t");
@@ -123,7 +123,7 @@ public class Gene implements IGeneWithFlanks {
 	}
 	
 	///////////////////////////////////////////////////////////////////////////////////////////////////////
-	//TODO Получение данных
+	//TODO Obtaining data
 	///////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public int getNumber() {
@@ -206,7 +206,7 @@ public class Gene implements IGeneWithFlanks {
 		this.length = lenght;
 	}
 	
-	//Записывает длину последовательности и число кодонов
+	//Records sequence length and number of codons
 	public void putLenght(int a, int b, int c, int d) {
 		this.leftFlankLength = a;
 		this.length = b;
@@ -312,10 +312,10 @@ public class Gene implements IGeneWithFlanks {
 		this.gcComposition = gcComposition;
 	}
 
-	//Записывает GC-состав гена в процентах
+	//Records the GC composition of the gene as a percentage
 	public void putGC_compoz() {
 		double gc_compos1 = 0;
-		//Количество gс в триплете
+		//Number of G bases in the triplet
 		int gc[] = {2, 3, 3, 2, 1, 2, 1, 2, 2, 1, 0, 1, 1, 2, 2, 1,
 					2, 1, 1, 2, 2, 1, 2, 3, 3, 2, 2, 3, 3, 2, 2, 3,
 					3, 2, 1, 2, 2, 1, 0, 1, 1, 0, 1, 2, 2, 1, 1, 2,
@@ -332,7 +332,7 @@ public class Gene implements IGeneWithFlanks {
 		return codonComposition0;
 	}
 	
-	//Возвращает строку с частотами кодонов через ";"
+	//Returns a semicolon-separated string of codon frequencies.
 	public String getCodonComposition0String() {
 		StringBuilder freq = new StringBuilder();
 		for (int i = 0; i < codonComposition0.length; i++) {
@@ -349,7 +349,7 @@ public class Gene implements IGeneWithFlanks {
 		return codonComposition;
 	}
 	
-	//Возвращает строку с частотами кодонов через ";"
+	//Returns a semicolon-separated string of codon frequencies.
 	public String getCodonCompositionString() {
 		StringBuilder freq = new StringBuilder();
 		for (int i = 0; i < codonComposition.length; i++) {
@@ -426,27 +426,27 @@ public class Gene implements IGeneWithFlanks {
 		this.eeiMass = eeiMass;
 	}
 	
-	//Записывает EEI1
+	//Recording EEI1.
 	public void putEEI1(double eei1) {
 		this.eeiMass[0] = ((eei1 != 0) ? (1/eei1) : 10);
 	}
 	
-	//Записывает EEI2
+	//Recording EEI2.
 	public void putEEI2(double eei2) {
 		this.eeiMass[1] = ((eei2 != 0) ? (1/eei2) : 10);
 	}
 	
-	//Записывает EEI3
+	//Recording EEI3.
 	public void putEEI3(double eei3) {
 		this.eeiMass[2] = ((eei3 != 0) ? (1/eei3) : 10);
 	}
 	
-	//Записывает EEI4
+	//Recording EEI4.
 	public void putEEI4(double eei4) {
 		this.eeiMass[3] = ((eei4 != 0) ? (2/eei4) : 10);
 	}
 	
-	//Записывает EEI5
+	//Recording EEI5.
 	public void putEEI5(double eei5) {
 		this.eeiMass[4] = ((eei5 != 0) ? (2/eei5) : 10);
 	}
@@ -525,12 +525,12 @@ public class Gene implements IGeneWithFlanks {
 		return naWithFlanks;
 	}
 	
-	//Возвращает последовательность
+	//Returns the sequence
 	public String getNAString() {
 		return String.valueOf(this.getNA());
 	}
 	
-	//Возвращает последовательность как требует пользователь
+	//Returns the sequence as required by the user
 	public char[] getUserNA(PGeneToString parameters) {
 		if (parameters.getrFlangTrue() < this.rightFlankLength) {
 			char dest[] = new char[this.leftFlankLength+this.length+parameters.getrFlangTrue()];
@@ -544,7 +544,7 @@ public class Gene implements IGeneWithFlanks {
 		this.naWithFlanks = na;
 	}
 	
-	//Вывод данных
+	//Data output
 	/*public String toString() { 
 		int rightFlang1 = (this.rightFl <= this.rFlangTrue) ? this.rightFl : this.rFlangTrue;
 		int leftFlang1 = (this.leftFl <= this.lFlangTrue) ? this.leftFl : this.lFlangTrue;
@@ -606,7 +606,7 @@ public class Gene implements IGeneWithFlanks {
 	}*/
 	
 	//"Number\tlocus_tag\tFBid\tgene_poz\t/position=\t/complement=\t/EEI=\tgeneNA"
-	//Вывод данных 2
+	//Data output 2
 	/*public String toString() {
 		int rightFlang1 = (this.rightFl <= this.rFlangTrue) ? this.rightFl : this.rFlangTrue;
 		int leftFlang1 = (this.leftFl <= this.lFlangTrue) ? this.leftFl : this.lFlangTrue;

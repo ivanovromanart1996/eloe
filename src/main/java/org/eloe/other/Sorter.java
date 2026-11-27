@@ -7,7 +7,7 @@ import org.eloe.organism.Gene;
 import org.eloe.organism.Organism;
 
 public class Sorter {
-	//Компаратор для eei
+	//Comparator for eei
 	private static final Comparator<Gene> eeiUp = new Comparator<Gene>() {
 		@Override
 		public int compare(Gene arg0, Gene arg1) {
@@ -24,7 +24,7 @@ public class Sorter {
 		}
 	};
 	
-	//Компаратор для eei1
+	//Comparator for eei1
 	private static final Comparator<Gene> eei1Up = new Comparator<Gene>() {
 		@Override
 		public int compare(Gene arg0, Gene arg1) {
@@ -41,7 +41,7 @@ public class Sorter {
 		}
 	};
 	
-	//Компаратор для eei2
+	//Comparator for eei2
 	private static final Comparator<Gene> eei2Up = new Comparator<Gene>() {
 		@Override
 		public int compare(Gene arg0, Gene arg1) {
@@ -58,7 +58,7 @@ public class Sorter {
 		}
 	};
 	
-	//Компаратор для eei3
+	//Comparator for eei3
 	private static final Comparator<Gene> eei3Up = new Comparator<Gene>() {
 		@Override
 		public int compare(Gene arg0, Gene arg1) {
@@ -75,7 +75,7 @@ public class Sorter {
 		}
 	};
 	
-	//Компаратор для eei4
+	//Comparator for eei4
 	private static final Comparator<Gene> eei4Up = new Comparator<Gene>() {
 		@Override
 		public int compare(Gene arg0, Gene arg1) {
@@ -92,7 +92,7 @@ public class Sorter {
 		}
 	};
 	
-	//Компаратор для eei5
+	//Comparator for eei5
 	private static final Comparator<Gene> eei5Up = new Comparator<Gene>() {
 		@Override
 		public int compare(Gene arg0, Gene arg1) {
@@ -109,7 +109,7 @@ public class Sorter {
 		}
 	};
 	
-	//Компаратор для номера гена
+	//Comparator for gene number
 	private static final Comparator<Gene> geneNumberUp = new Comparator<Gene>() {
 		@Override
 		public int compare(Gene arg0, Gene arg1) {
@@ -126,7 +126,7 @@ public class Sorter {
 		}
 	};
 	
-	//Компаратор для lci1
+	//Comparator for lci1
 	private static final Comparator<Gene> lci1Up = new Comparator<Gene>() {
 		@Override
 		public int compare(Gene arg0, Gene arg1) {
@@ -143,7 +143,7 @@ public class Sorter {
 		}
 	};
 	
-	//Компаратор для lci2
+	//Comparator for lci2
 	private static final Comparator<Gene> lci2Up = new Comparator<Gene>() {
 		@Override
 		public int compare(Gene arg0, Gene arg1) {
@@ -160,7 +160,7 @@ public class Sorter {
 		}
 	};
 	
-	//Компаратор для tai
+	//Comparator for tai
 	private static final Comparator<Gene> taiUp = new Comparator<Gene>() {
 		@Override
 		public int compare(Gene arg0, Gene arg1) {
@@ -177,7 +177,7 @@ public class Sorter {
 		}
 	};
 	
-	//Компаратор для tei
+	//Comparator for tei
 	private static final Comparator<Gene> teiUp = new Comparator<Gene>() {
 		@Override
 		public int compare(Gene arg0, Gene arg1) {
@@ -194,7 +194,7 @@ public class Sorter {
 		}
 	};
 	
-	//Компаратор для p_i1
+	//Comparator for p_i1
 	private static final Comparator<Gene> pi1Up = new Comparator<Gene>() {
 		@Override
 		public int compare(Gene arg0, Gene arg1) {
@@ -211,7 +211,7 @@ public class Sorter {
 		}
 	};
 	
-	//Компаратор для p_i2
+	//Comparator for p_i2
 	private static final Comparator<Gene> pi2Up = new Comparator<Gene>() {
 		@Override
 		public int compare(Gene arg0, Gene arg1) {
@@ -228,7 +228,7 @@ public class Sorter {
 		}
 	};
 	
-	//Компаратор для количества повторов
+	//Comparator for number of repetitions
 	private static final Comparator<Gene> repeatsUp = new Comparator<Gene>() {
 		@Override
 		public int compare(Gene arg0, Gene arg1) {
@@ -245,7 +245,7 @@ public class Sorter {
 		}
 	};
 	
-	//TODO Сортировка списка по увеличению EEI гена
+	//TODO Sort by ascending EEI.
 	public static void sortup(Organism organism) {
 		switch (organism.getIndex()) {
 			case 0: Collections.sort(organism.getGenes(), eei1Up); break;
@@ -256,7 +256,7 @@ public class Sorter {
 		}
 	}
 	
-	//Сортировка списка по уменьшению EEI гена
+	//Sort by descending EEI.
 	public static void sortdown(Organism organism) {
 		switch (organism.getIndex()) {
 			case 0: Collections.sort(organism.getGenes(), Collections.reverseOrder(eei1Up)); break;
@@ -267,7 +267,7 @@ public class Sorter {
 		}
 	}
 	
-	//Сортировка списка по увеличению EEI гена
+	//Sort by ascending EEI.
 	public static void sortupEEIN(Organism organism, int n) {
 		switch (n) {
 			case 1: Collections.sort(organism.getGenes(), eei1Up); break;
@@ -279,7 +279,7 @@ public class Sorter {
 		}
 	}
 	
-	//Сортировка списка по уменьшению EEI гена
+	//Sort by descending EEI.
 	public static void sortdownEEIN(Organism organism, int n) {
 		switch (n) {
 			case 1: Collections.sort(organism.getGenes(), Collections.reverseOrder(eei1Up)); break;
@@ -291,72 +291,72 @@ public class Sorter {
 		}
 	}
 	
-	//Сортировка списка по уменьшению EEI гена
+	//Sort by descending EEI.
 	public static void sorteeidown(Organism organism) {
 		Collections.sort(organism.getGenes(), Collections.reverseOrder(eeiUp));
 	}
 	
-	//Сортировка списка по увеличению номера гена
+	//Sort the list by ascending gene number.
 	public static void sortNup(Organism organism) {
 		Collections.sort(organism.getGenes(), geneNumberUp);
 	}
 	
-	//Сортировка списка по уменьшению номера гена
+	//Sort by descending gene number.
 	public static void sortNdown(Organism organism) {
 		Collections.sort(organism.getGenes(), Collections.reverseOrder(geneNumberUp));
 	}
 	
-	//Сортировка списка по увеличению LCI1 гена
+	//Sort by ascending LCI1.
 	public static void sortLCI1up(Organism organism) {
 		Collections.sort(organism.getGenes(), lci1Up);
 	}
 	
-	//Сортировка списка по уменьшению LCI1 гена
+	//Sort by descending LCI1.
 	public static void sortLCI1down(Organism organism) {
 		Collections.sort(organism.getGenes(), Collections.reverseOrder(lci1Up));
 	}
 	
-	//Сортировка списка по увеличению LCI2 гена
+	//Sort by ascending LCI2.
 	public static void sortLCI2up(Organism organism) {
 		Collections.sort(organism.getGenes(), lci2Up);
 	}
 	
-	//Сортировка списка по уменьшению LCI2 гена
+	//Sort by descending LCI2.
 	public static void sortLCI2down(Organism organism) {
 		Collections.sort(organism.getGenes(), Collections.reverseOrder(lci2Up));
 	}
 	
-	//Сортировка списка по увеличению Tai гена
+	//Sort by ascending Tai.
 	public static void sortTaup(Organism organism) {
 		Collections.sort(organism.getGenes(), taiUp);
 	}
 	
-	//Сортировка списка по уменьшению Tai гена
+	//Sort by descending Tai.
 	public static void sortTadown(Organism organism) {
 		Collections.sort(organism.getGenes(), Collections.reverseOrder(taiUp));
 	}
 	
-	//Сортировка списка по увеличению Tei гена
+	//Sort by ascending Tei.
 	public static void sortTeup(Organism organism) {
 		Collections.sort(organism.getGenes(), teiUp);
 	}
 	
-	//Сортировка списка по уменьшению Tei гена
+	//Sort by descending Tei.
 	public static void sortTedown(Organism organism) {
 		Collections.sort(organism.getGenes(), Collections.reverseOrder(teiUp));
 	}
 	
-	//Сортировка списка по увеличению p_i1 гена
+	//Sort by ascending p_i1.
 	public static void sortP_i1up(Organism organism) {
 		Collections.sort(organism.getGenes(), pi1Up);
 	}
 	
-	//Сортировка списка по увеличению p_i2 гена
+	//Sort by ascending p_i2.
 	public static void sortP_i2up(Organism organism) {
 		Collections.sort(organism.getGenes(), pi2Up);
 	}
 	
-	//Сортировка списка по увеличению колическва повторов в гене
+	//Sorting the list for increasing the number of repeats in the gene
 	public static void sortRepeatsup(Organism organism) {
 		Collections.sort(organism.getGenes(), repeatsUp);
 	}

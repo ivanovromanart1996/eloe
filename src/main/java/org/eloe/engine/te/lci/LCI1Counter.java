@@ -6,22 +6,22 @@ import org.eloe.engine.te.lci.lci1.Lci1Calculator;
 import org.eloe.organism.Gene;
 import org.eloe.parameters.PLCI1;
 
-// Програма для подсчета индекса локальной комплементарности
+// Program for calculating the local complementarity index
 public class LCI1Counter {
 	
-	//Среднее значение LCI
+	//Average LCI value
 	private double m1;
-	//Среднее отклонение LCI
+	//Average deviation of LCI
 	private double sigma1;
 	
 	private ILciCalculator lci1Calculator;
 	
-	//Конструктор
+	//Constructor
 	public LCI1Counter(PLCI1 parameters) {
 		lci1Calculator = new Lci1Calculator(parameters);
 	}
 	
-	//TODO Рассчет LCI1
+	//TODO Calculation of LCI1
 	public final void countLCI(List<Gene> genes) {
 		
 		double sum = 0;
@@ -38,21 +38,21 @@ public class LCI1Counter {
 		double average = sum/genes.size();
 		double disp = Math.sqrt(sum2/genes.size()-average*average);
 		
-		//фортран
+		//Fortran
 		this.m1 = average+2*disp;
 		this.sigma1 = 4*disp;
 		
-		//статьи
+		//Articles
 		//this.m1 = average;
 		//this.sigma1 = forSigma1*disp;
 	}
 	
-	//TODO Возвращает среднее значение LCI
+	//TODO Returns the average LCI
 	public final double getM() {
 		return this.m1;
 	}
 	
-	//TODO Возвращает среднее отклонение LCI
+	//TODO Returns the mean deviation of the LCI
 	public final double getSigma() {
 		return this.sigma1;
 	}

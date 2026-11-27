@@ -16,9 +16,9 @@ private static final Logger LOG = Logger.getLogger(Lci2CalculatorAbstract.class)
 	private PLCI2 parameters;
 	private int distance;
 	private int rightFlank;
-	//Карта для записи энергии динуклеотидов
+	//Map for recording the energy of dinucleotides
 	private Map<String, Double> map = new HashMap<String, Double>();
-	//Массив с энергиями петель
+	//Loop energy array
 	private double loopenergy[];
 	
 	public Lci2CalculatorAbstract(PLCI2 parameters, Map<String, Double> map, double[] loopenergy) {
@@ -37,9 +37,9 @@ private static final Logger LOG = Logger.getLogger(Lci2CalculatorAbstract.class)
 			return 0;
 		}
 		
-		//Длина исследуемой части гена (3 - стоп-кодон)
+		//The length of the part of the gene under study (3 - stop codon)
 		int lenght = gene.getLength()-3+rightFlank;
-		//Граница левого края скользящей рамки
+		//The boundary of the left edge of the sliding frame
 		int edge = lenght-2*parameters.getSmax2()-parameters.getLmax2()+1;
 		if (edge < 0) {
 			LOG.info("The length of gene "+gene.getName()+" with flanks is not enough for LCI2 calculation.");
@@ -47,59 +47,59 @@ private static final Logger LOG = Logger.getLogger(Lci2CalculatorAbstract.class)
 		}
 		
 		char[] na = new char[lenght];
-		//Достаем ген без флангов + h нуклеотидов на 3' конце
+		//Get the gene without flanks + h nucleotides at the 3' end
 		System.arraycopy(gene.getNaWithFlanks(), gene.getLeftFlankLength(), na, 0, lenght);
 		
-		//Полная энергия взаимодействия
+		//Total energy of interaction
 		double energyFull = 0;
 		for (int j = 0; j < edge; j++) {
-			//Энергия шпилек
+			//Hairpin energy
 			double energy = 0;
 			for (int s = parameters.getSmin2(); s <= parameters.getSmax2(); s++) {
 				
-				//Строка для повтора
+				//Buffer for the repeat
 				char[] char1 = new char[s];
-				//Копирование последовательности
+				//Copying the sequence
 				System.arraycopy(na, j, char1, 0, s);
 				
-				//Энергия выбранного повтора
+				//Energy of the selected repeat
 				double energy_char1 = 0;
 				
 				for (int m = 0; m < s-1; m++) {
 					String dinukleotid = char1[m]+""+char1[m+1];
 					
 					if (map.containsKey(dinukleotid)) {
-						//Энергия взаимодействия повторов
+						//Repeat interaction energy
 						energy_char1 += map.get(dinukleotid);
 					}
 				}
 				
-				//Строка для комплементарной последовательности
+				//Buffer for the complementary sequence
 				String con1 = String.valueOf(reverseComplement(char1));
 				
-				//Длина участка поиска
+				//Length of search area
 				int lenght1 = s+distance;
-				//Участок поиска
+				//Search site
 				char[] char2 = new char[lenght1];
-				//Достаем участок поиска
+				//Extract the search region.
 				System.arraycopy(na, j+s+parameters.getLmin2(), char2, 0, lenght1);
-				//Участок поиска
+				//Search site
 				String con2 = String.valueOf(char2);
 				
 				int poz = 0;
-				//Энергия петель
+				//Loop energy
 				double loop1 = 0;
 				
-				//Поиск повторов (комплементарных участков)
+				//Search for repeats (complementary regions).
 				int k = con2.indexOf(con1, poz);
 				while (k != -1) {
 					int loopsize = parameters.getLmin2()+k-1;
 					
-					//Энергия петель
+					//Loop energy
 					loop1 = loopenergy[(loopsize < loopenergy.length) ? loopsize : (loopenergy.length-1)];
 					double e = energy_char1 - loop1;
 					
-					//Если энергия больше порога существоавания петли, тогда учитываем эту петлю
+					//If the energy is greater than the threshold of the existence of the loop, then take into account this loop.
 					if (e >= parameters.getMinloopEnergy()) {
 						energy += e;
 					}
@@ -107,7 +107,7 @@ private static final Logger LOG = Logger.getLogger(Lci2CalculatorAbstract.class)
 					k = con2.indexOf(con1, poz);
 				}
 			}
-			//Полная энергия
+			//Total energy
 			energyFull += energy;
 		}
 		

@@ -30,18 +30,18 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import org.eloe.other.Auxiliary_Class;
 
-//TODO Считывание значений LCIij и раcсчет корреляции
+//TODO Reading of LCIij values and calculation of correlation
 public class LCIijDataProcessing {
 	
 	private static final Logger LOG = Logger.getLogger(LCIijDataProcessing.class);
 	
-	//Дополнительные данные для прокариот
+	//Additional data for prokaryotes
 	private static final int FIRSTPRO = 5;
-	//Дополнительные данные для эукариот
+	//Additional data for eukaryotes
 	private static final int FIRSTEU = 1;
-	//Минимальная длина гена
+	//Minimum gene length
 	private static final int BETWEEN = 3;
-	//Размер флангов
+	//Size of flanks
 	private static final int FLANGSIZE = 600;
 	
 	public static void readLCIij(File fileInput1, File fileInput2, File fileOutput) {
@@ -57,7 +57,7 @@ public class LCIijDataProcessing {
 		BufferedReader readerLCIij = null;
 		BufferedReader readerEEI = null;
 		try {
-			//Первый файл
+			//First file.
 			readerLCIij = new BufferedReader(new FileReader(fileInput1));
 			String line = readerLCIij.readLine();
 			if (line.contains("eucaryota")) {
@@ -90,7 +90,7 @@ public class LCIijDataProcessing {
 				}
 			}
 			
-			//Второй файл
+			//Second file.
 			readerEEI = new BufferedReader(new FileReader(fileInput2));
 			line = readerEEI.readLine();
 			while ((line = readerEEI.readLine()) != null) {
@@ -123,8 +123,8 @@ public class LCIijDataProcessing {
 		}
 		time = Auxiliary_Class.time("reading LCIij data", time);
 		
-		//TODO Рассчет корреляции
-		//Среднее значение EEI
+		//TODO Calculation of correlation
+		//Average EEI
 		double sredv = 0;
 		if (matrixEEI.size() == matrixL.size()) {
 			for (int i = 0; i < matrixEEI.size(); i++) {
@@ -137,7 +137,7 @@ public class LCIijDataProcessing {
 			LOG.error("matrixEEI.size() != matrixL.size()\n"
 					+ "matrixEEI.size(): "+matrixEEI.size()+" matrixL.size(): "+matrixL.size());
 		}
-		//Среднее значение LCIij первых и последних нуклеотидов
+		//Average LCIij values of first and last nucleotides
 		double sredmL[] = new double[razmer];
 		double sredmLFandL[] = new double[razmer];
 		double sredmLFandNoL[] = new double[razmer];
@@ -158,24 +158,24 @@ public class LCIijDataProcessing {
 					sredmL[j] += matrixL.get(i)[first+j];
 					sredmR[j] += matrixR.get(i)[first+j];
 					if (procaryota) {
-						if (matrixL.get(i)[1] == 1.) { //Если ген first&last
+						if (matrixL.get(i)[1] == 1.) { //If the gene is first&last
 							if (j == 0) _FandL++;
 							sredmLFandL[j] += matrixL.get(i)[first+j];
 							sredmRFandL[j] += matrixR.get(i)[first+j];
 						}
 						else {
-							if (matrixL.get(i)[3] == 1.) { //Если ген middle
+							if (matrixL.get(i)[3] == 1.) { //If the gene is middle
 								if (j == 0) _Mid++;
 								sredmLMid[j] += matrixL.get(i)[first+j];
 								sredmRMid[j] += matrixR.get(i)[first+j];
 							}
 							else {
-								if (matrixL.get(i)[2] == 1.) { //Если ген first&!last
+								if (matrixL.get(i)[2] == 1.) { //If the gene is first&!last
 									if (j == 0) _FandNoL++;
 									sredmLFandNoL[j] += matrixL.get(i)[first+j];
 									sredmRFandNoL[j] += matrixR.get(i)[first+j];
 								}
-								else { //Если ген last&!first
+								else { //If the gene is last&!first
 									if (j == 0) _LandNoF++;
 									sredmLLandNoF[j] += matrixL.get(i)[first+j];
 									sredmRLandNoF[j] += matrixR.get(i)[first+j];
@@ -204,13 +204,13 @@ public class LCIijDataProcessing {
 			System.out.println("matrixL.size(): "+matrixL.size()+" matrixR.size(): "+matrixR.size());
 			LOG.error("matrixL.size() != matrixR.size(), || sredm1.length != sredm2.length\nmatrixL.size(): "+matrixL.size()+" matrixR.size(): "+matrixR.size());
 		}
-		//Дельта вектора
+		//Delta vector
 		double deltv = 0;
 		for (int i = 0; i < matrixEEI.size(); i++) {
 			deltv += Math.pow((matrixEEI.get(i)[first]-sredv), 2);
 		}
 		deltv = Math.sqrt(deltv/matrixEEI.size());
-		//Дельта первой матрицы
+		//Delta of the first matrix
 		double deltm1[] = new double[razmer];
 		Arrays.fill(deltm1, 0);
 		for (int j = 0; j < razmer; j++) {
@@ -219,7 +219,7 @@ public class LCIijDataProcessing {
 			}
 			deltm1[j] = Math.sqrt(deltm1[j]/matrixL.size());
 		}
-		//Дельта второй матрицы
+		//Delta of the second matrix
 		double deltm2[] = new double[razmer];
 		Arrays.fill(deltm2, 0);
 		for (int j = 0; j < razmer; j++) {
@@ -261,7 +261,7 @@ public class LCIijDataProcessing {
 		//=============================================================================================================
 		//=============================================================================================================
 		//=============================================================================================================
-		//TODO Вывод рассчетов в файл
+		//TODO Output of calculations into file
 		
 		int shift = 4;
 		

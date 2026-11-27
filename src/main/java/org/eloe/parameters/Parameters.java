@@ -698,19 +698,19 @@ public class Parameters implements PExtraction, PProcessing, PLCI1, PLCI2, PTa, 
 	
 	//TODO
 	public final int teachingGenes(final int number) {
-		//Подсчет количества генов в выборке, если указано точное количество
+		//Counting the number of genes in the sample, if the exact number is specified
 		int number2;
 		if (this.number_percentage) {
 			number2 = this.teachingGenesNumber;
-			//Подсчет количества генов в выборке, если указано точное количество, 
-			//но удвоенное оно больше общего числа генов в геноме
+			//Counting the number of genes in the sample, if the exact number is specified, 
+			//but twice that number exceeds the total number of genes in the genome.
 			if (2 * number2 > number) {
-				//Берем 10%
+				//Take 10%.
 				number2 = (int) Math.round(number / 10);
-				//Вывод в консоль сообщения об ошибке
+				//Print the error message to the console.
 				LOG.warn("WARNING! Number of genes is bigger than half of number of genes in genome! (For counting 10% of genome were taken)");
 			}
-		} else { //Подсчет количества генов в выборке, если указано количество в процентах от полного числа генов в геноме
+		} else { //Counting the number of genes in the sample, if the number is indicated as a percentage of the total number of genes in the genome
 			number2 = (int) Math.round(number * this.teachingGenesPercentage / 100.0);
 		}
 		return number2;

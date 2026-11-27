@@ -15,61 +15,61 @@ public class M1_Counter {
 	private static final Logger LOG = Logger.getLogger(M1_Counter.class);
 	
 	public static int[] count_m1(Organism organism, int number2, double minKc, double ve, int unUseCodonsL, int unUseCodonsR) {
-		//Подсчет Tai (не работает без "Подсчета частот кодонов в гене")
+		//Tai counting (does not work without "Counting codon frequencies in a gene")
 		Ta_Counter a = new Ta_Counter(minKc, ve, number2, unUseCodonsL, unUseCodonsR);
 		a.countTaiFirst(organism.getGenes());
 		
-		//Сортировка списка по Tai
+		//Sorting the list by Tai
 		Sorter.sortTadown(organism);
 		
-		//Порядок генов в обучающей выборке
+		//The order of genes in the training sample
 		int number = organism.getGenes().size();
 		int numberd = number-number2;
 		Set<Integer> set1 = new HashSet<Integer>(number2);
 		
-		//Запись положения генов обучающей выборки
+		//Recording the position of the genes of the training sample
 		for (int i = 0; i < number2; i++) {
 			set1.add(organism.getGenes().get(numberd+i).getNumber());
 		}
 		boolean repeatflag = false;
 		int repeatcounter = 0;
 		
-		//Подсчет Tai
+		//Tai counting
 		do {
 			repeatflag = false;
-			//Счетчик количества циклов
+			//Cycle counter
 			repeatcounter++;
-			//Подсчет Tai (не работает без "Подсчета частот кодонов в гене")
+			//Tai counting (does not work without "Counting codon frequencies in a gene")
 			a.countTai(organism.getGenes());
 			
-			//Сортировка списка по убыванию Tai
+			//Sorting the list by descending Tai
 			Sorter.sortTadown(organism);
 			Set<Integer> set2 = new HashSet<Integer>(number2);
-			//Проверка положений контрольных генов
+			//Checking the positions of control genes
 			for (int i = 0; i < number2; i++) {
 				set2.add(organism.getGenes().get(numberd+i).getNumber());
 			}
 			
-			//Если обучающие выборки не совпадают, повтор цикла
+			//If the training samples do not match, repeat the cycle
 			if (!set1.containsAll(set2)) {
 				set1 = set2;
 				repeatflag = true;
 			}
 		} while (repeatflag && (repeatcounter < 30));
 		
-		//В случае зацикливания
+		//If the iteration cycles
 		if (repeatcounter >= 30) {
 			LOG.warn("Warning! Many cicles! RepeatCounter >= 30 (have to be <30)");
 		}
 		
-		//Нахождение и запись в файл позиций рибосомных генов
+		//Finding and writing positions of ribosomal genes
 		int djmass[] = ribpozition1(organism.getGenes(), organism.getRibGenesNumber());
 		
-		//Среднее и смещение позиций рибосомных генов
+		//Mean and displacement of ribosomal gene positions
 		return djmass;
 	}
 	
-	//Позиция рибосомальных генов
+	//Position of ribosomal genes
 	private static int[] ribpozition1(List<Gene> l, int ribgenes) {
 		int djmass[] = {0, 0};
 		if (ribgenes != 0) {
